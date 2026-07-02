@@ -4,6 +4,7 @@ import os
 from dataclasses import replace
 
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 
 from tutor_bot.config import load_settings
 from tutor_bot.webapp import app as g0_app
@@ -23,10 +24,17 @@ sam_settings = replace(
     base_settings,
     bot_token=_required_env("SAM_BOT_TOKEN"),
     database_path=os.getenv("SAM_DATABASE_PATH", "/data/sam_zabot.sqlite3"),
-    webapp_url=f"{base_url}/client-694590118",
+    webapp_url=f"{base_url}/client-694590118/",
     webapp_url_aliases=[],
 )
 
 app = FastAPI(title="BOTai Telegram bots")
+
+
+@app.get("/client-694590118", include_in_schema=False)
+def redirect_sam_miniapp() -> RedirectResponse:
+    return RedirectResponse(url="/client-694590118/", status_code=307)
+
+
 app.mount("/client-694590118", create_app(sam_settings))
 app.mount("/", g0_app)

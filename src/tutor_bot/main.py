@@ -209,17 +209,33 @@ async def setup_miniapp_menu_button(bot: Bot, settings: Settings, db: SQLiteStor
     if not settings.telegram_webapp_url:
         return
     menu_button = MenuButtonWebApp(text="Кабинет", web_app=WebAppInfo(url=settings.telegram_webapp_url))
-    try:
-        await bot.set_chat_menu_button(menu_button=menu_button)
-    except Exception:
-        logging.exception("Failed to set Telegram Mini App menu button")
+
+    async def set_menu_button_with_retry(chat_id: int | None = None) -> None:
+        for attempt in range(1, 6):
+            try:
+                await bot.set_chat_menu_button(chat_id=chat_id, menu_button=menu_button)
+                return
+            except Exception:
+                if attempt == 5:
+                    logging.exception(
+                        "Failed to set Telegram Mini App menu button%s after %s attempts",
+                        f" for chat {chat_id}" if chat_id is not None else "",
+                        attempt,
+                    )
+                    return
+                logging.warning(
+                    "Failed to set Telegram Mini App menu button%s (attempt %s/5), retrying",
+                    f" for chat {chat_id}" if chat_id is not None else "",
+                    attempt,
+                    exc_info=True,
+                )
+                await asyncio.sleep(attempt * 2)
+
+    await set_menu_button_with_retry()
     known_chat_ids = {user.telegram_id for user in db.list_user_accounts()}
     known_chat_ids.update(settings.admin_telegram_ids)
     for chat_id in sorted(known_chat_ids):
-        try:
-            await bot.set_chat_menu_button(chat_id=chat_id, menu_button=menu_button)
-        except Exception:
-            logging.exception("Failed to set Telegram Mini App menu button for chat %s", chat_id)
+        await set_menu_button_with_retry(chat_id)
 
 
 def _truthy_env(name: str) -> bool:

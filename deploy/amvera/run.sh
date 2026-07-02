@@ -52,7 +52,7 @@ if [[ "$RUN_TELEGRAM_BOTS" =~ ^(1|true|yes|on)$ ]]; then
   env \
     BOT_TOKEN="$SAM_BOT_TOKEN" \
     DATABASE_PATH="$SAM_DATABASE_PATH" \
-    WEBAPP_URL="$PUBLIC_BASE_URL/client-694590118" \
+    WEBAPP_URL="$PUBLIC_BASE_URL/client-694590118/" \
     DISABLE_BACKGROUND_REMINDERS=1 \
     python -m tutor_bot.main &
   pids+=("$!")

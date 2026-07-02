@@ -6,6 +6,8 @@ export PYTHONPATH="$PROJECT_ROOT/src${PYTHONPATH:+:$PYTHONPATH}"
 
 PUBLIC_BASE_URL="${PUBLIC_BASE_URL:-}"
 PUBLIC_BASE_URL="${PUBLIC_BASE_URL%/}"
+TELEGRAM_WEBAPP_BASE_URL="${TELEGRAM_WEBAPP_BASE_URL:-https://botai-g0faq.amvera.io}"
+TELEGRAM_WEBAPP_BASE_URL="${TELEGRAM_WEBAPP_BASE_URL%/}"
 G0_DATABASE_PATH="${G0_DATABASE_PATH:-/data/g0_faq_bot.sqlite3}"
 SAM_DATABASE_PATH="${SAM_DATABASE_PATH:-/data/sam_zabot.sqlite3}"
 # TimeWeb is decommissioned; Amvera is now the single runtime for Telegram polling.
@@ -26,7 +28,8 @@ fi
 export BOT_RUNTIME=server
 export BOT_TOKEN="$G0_BOT_TOKEN"
 export DATABASE_PATH="$G0_DATABASE_PATH"
-export WEBAPP_URL="$PUBLIC_BASE_URL"
+export TELEGRAM_WEBAPP_BASE_URL
+export WEBAPP_URL="$TELEGRAM_WEBAPP_BASE_URL/"
 export WEBAPP_HOST=0.0.0.0
 export WEBAPP_PORT="$PORT"
 
@@ -45,14 +48,14 @@ if [[ "$RUN_TELEGRAM_BOTS" =~ ^(1|true|yes|on)$ ]]; then
   env \
     BOT_TOKEN="$G0_BOT_TOKEN" \
     DATABASE_PATH="$G0_DATABASE_PATH" \
-    WEBAPP_URL="$PUBLIC_BASE_URL" \
+    WEBAPP_URL="$TELEGRAM_WEBAPP_BASE_URL/" \
     python -m tutor_bot.main &
   pids+=("$!")
 
   env \
     BOT_TOKEN="$SAM_BOT_TOKEN" \
     DATABASE_PATH="$SAM_DATABASE_PATH" \
-    WEBAPP_URL="$PUBLIC_BASE_URL/client-694590118/" \
+    WEBAPP_URL="$TELEGRAM_WEBAPP_BASE_URL/client-694590118/" \
     DISABLE_BACKGROUND_REMINDERS=1 \
     python -m tutor_bot.main &
   pids+=("$!")

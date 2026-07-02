@@ -19,12 +19,13 @@ def _required_env(name: str) -> str:
 
 
 base_url = _required_env("PUBLIC_BASE_URL").rstrip("/")
+telegram_base_url = os.getenv("TELEGRAM_WEBAPP_BASE_URL", "https://botai-g0faq.amvera.io").rstrip("/")
 base_settings = load_settings()
 sam_settings = replace(
     base_settings,
     bot_token=_required_env("SAM_BOT_TOKEN"),
     database_path=os.getenv("SAM_DATABASE_PATH", "/data/sam_zabot.sqlite3"),
-    webapp_url=f"{base_url}/client-694590118/",
+    webapp_url=f"{telegram_base_url}/client-694590118/",
     webapp_url_aliases=[],
 )
 

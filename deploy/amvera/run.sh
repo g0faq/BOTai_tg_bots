@@ -8,7 +8,8 @@ PUBLIC_BASE_URL="${PUBLIC_BASE_URL:-}"
 PUBLIC_BASE_URL="${PUBLIC_BASE_URL%/}"
 G0_DATABASE_PATH="${G0_DATABASE_PATH:-/data/g0_faq_bot.sqlite3}"
 SAM_DATABASE_PATH="${SAM_DATABASE_PATH:-/data/sam_zabot.sqlite3}"
-RUN_TELEGRAM_BOTS="${RUN_TELEGRAM_BOTS:-0}"
+# TimeWeb is decommissioned; Amvera is now the single runtime for Telegram polling.
+RUN_TELEGRAM_BOTS=1
 PORT="${PORT:-80}"
 
 : "${PUBLIC_BASE_URL:?Set PUBLIC_BASE_URL to the public HTTPS address}"

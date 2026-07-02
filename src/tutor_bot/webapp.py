@@ -66,7 +66,7 @@ BROWSER_SESSION_COOKIE_PREFIX = "tutor_browser_session"
 ADVANCE_PAYMENT_MARKERS = {"advance", "auto"}
 ADVANCE_OVERRIDE_PREFIX = "[[botai_advance_override:"
 ADVANCE_OVERRIDE_SUFFIX = "]]"
-APP_VERSION = "20260621-browser-invite-v69"
+APP_VERSION = "20260702-amvera-runtime-v70"
 
 
 class AppState:

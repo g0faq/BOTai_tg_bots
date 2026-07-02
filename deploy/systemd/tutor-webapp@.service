@@ -1,0 +1,26 @@
+[Unit]
+Description=Tutor Telegram Mini App %i
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=tutorbot
+Group=tutorbot
+WorkingDirectory=/opt/tutor-bots/app
+Environment=PYTHONUNBUFFERED=1
+Environment=BOT_RUNTIME=server
+Environment=ENV_FILE=/opt/tutor-bots/%i/.env
+EnvironmentFile=/opt/tutor-bots/%i/.env
+ExecStart=/bin/bash -lc 'exec /opt/tutor-bots/app/.venv/bin/python -m uvicorn tutor_bot.webapp:app --host "${WEBAPP_HOST:-127.0.0.1}" --port "${WEBAPP_PORT:-8000}"'
+Restart=always
+RestartSec=3
+TimeoutStopSec=30
+KillSignal=SIGINT
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ReadWritePaths=/opt/tutor-bots
+
+[Install]
+WantedBy=multi-user.target

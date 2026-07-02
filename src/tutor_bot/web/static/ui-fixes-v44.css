@@ -1,0 +1,2000 @@
+/* Targeted screenshot fixes loaded after system UI layers. */
+.premium-stat {
+  border: 1px solid var(--border) !important;
+  color: var(--text-main);
+  cursor: default;
+  font: inherit;
+  text-align: left;
+}
+
+button.premium-stat {
+  cursor: pointer;
+}
+
+button.premium-stat:active {
+  transform: scale(0.99);
+}
+
+.students-screen > .premium-screen-head {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+}
+
+.students-screen > .premium-screen-head .primary-button {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  justify-self: start !important;
+}
+
+.students-screen > .premium-screen-head > div {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  min-width: 0 !important;
+  text-align: right !important;
+}
+
+.premium-student-meta {
+  display: flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  min-width: 0 !important;
+  margin-top: 4px !important;
+  overflow: hidden !important;
+}
+
+.premium-student-meta p {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  color: var(--text-muted) !important;
+  font-size: 12px !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+.premium-student-meta .premium-tags {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  justify-content: flex-start !important;
+  flex-wrap: nowrap !important;
+  overflow: hidden !important;
+}
+
+.premium-student-meta .premium-tags span {
+  flex: 0 1 auto !important;
+  max-width: 108px !important;
+}
+
+.student-head-actions {
+  align-self: stretch !important;
+  grid-template-rows: 1fr auto !important;
+}
+
+.student-edit-done-button {
+  align-self: end !important;
+  min-height: 34px !important;
+  border-color: rgba(168, 121, 255, 0.22) !important;
+  background: rgba(124, 77, 255, 0.13) !important;
+  color: rgba(244, 247, 251, 0.72) !important;
+  box-shadow: none !important;
+}
+
+.calendar-panel .premium-screen-head {
+  gap: 6px !important;
+}
+
+.calendar-head-controls {
+  order: -1 !important;
+  justify-items: start !important;
+}
+
+.calendar-head-controls .calendar-modes,
+.calendar-modes {
+  width: min(360px, 100%) !important;
+}
+
+.calendar-title-block span:empty {
+  display: none !important;
+}
+
+.calendar-mode-summary article:nth-child(2) strong {
+  font-size: clamp(20px, 5.8vw, 28px) !important;
+}
+
+.lesson-meta .lesson-price {
+  color: var(--text-main) !important;
+  font-size: 1.08em !important;
+  font-weight: 900 !important;
+}
+
+.lesson-row,
+.student-lessons-section .lesson-row,
+.drawer-panel[data-view="student-detail"] .lesson-row {
+  grid-template-columns: 82px minmax(0, 1fr) 104px !important;
+  gap: 12px !important;
+}
+
+.lesson-row time,
+.drawer-panel[data-view="student-detail"] .lesson-row time {
+  padding-right: 12px !important;
+}
+
+.lesson-main,
+.drawer-panel[data-view="student-detail"] .lesson-main {
+  padding-left: 2px !important;
+}
+
+.tabbar,
+body.browser-webapp .tabbar,
+body.tg-webapp .tabbar {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 4px !important;
+  min-height: 62px !important;
+  padding: 5px 7px max(5px, env(safe-area-inset-bottom)) !important;
+  align-items: center !important;
+}
+
+.tabbar::before,
+.tabbar::after,
+body.browser-webapp .tabbar::before,
+body.browser-webapp .tabbar::after,
+body.tg-webapp .tabbar::before,
+body.tg-webapp .tabbar::after {
+  display: none !important;
+  content: none !important;
+}
+
+.tabbar button {
+  width: 100% !important;
+  min-height: 50px !important;
+  padding: 4px 5px !important;
+}
+
+.tabbar button[data-view="overview"] {
+  order: 0 !important;
+}
+
+.tabbar button[data-view="students"] {
+  order: 1 !important;
+}
+
+.tabbar button[data-view="calendar"] {
+  order: 2 !important;
+}
+
+.tabbar button[data-view="homeworks"] {
+  order: 3 !important;
+}
+
+.tabbar button[data-view="finances"] {
+  order: 4 !important;
+}
+
+.tabbar button span {
+  font-size: 10px !important;
+}
+
+@media (max-width: 430px) {
+  .students-screen > .premium-screen-head {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .students-screen > .premium-screen-head .primary-button {
+    min-width: 0 !important;
+    max-width: 168px !important;
+    white-space: normal !important;
+  }
+
+  .students-screen > .premium-screen-head h2 {
+    font-size: clamp(22px, 6vw, 28px) !important;
+  }
+
+  .lesson-row,
+  .student-lessons-section .lesson-row,
+  .drawer-panel[data-view="student-detail"] .lesson-row {
+    grid-template-columns: 76px minmax(0, 1fr) 72px !important;
+    gap: 10px !important;
+  }
+
+  .lesson-row time,
+  .drawer-panel[data-view="student-detail"] .lesson-row time {
+    padding-right: 10px !important;
+    font-size: clamp(22px, 6.2vw, 27px) !important;
+  }
+
+  .premium-student-hero {
+    grid-template-columns: 34px 52px minmax(0, 1fr) 44px !important;
+  }
+
+  .premium-student-meta {
+    gap: 5px !important;
+  }
+
+  .premium-student-meta .premium-tags span {
+    max-width: 92px !important;
+  }
+}
+
+@media (min-width: 900px) {
+  body.browser-webapp .tabbar {
+    display: flex !important;
+    grid-template-columns: none !important;
+    gap: 0 !important;
+  }
+
+  body.browser-webapp .tabbar button[data-view="overview"] {
+    order: 0 !important;
+  }
+
+  body.browser-webapp .tabbar button[data-view="students"] {
+    order: 1 !important;
+  }
+
+  body.browser-webapp .tabbar button[data-view="calendar"] {
+    order: 2 !important;
+  }
+
+  body.browser-webapp .tabbar button[data-view="homeworks"] {
+    order: 3 !important;
+  }
+
+  body.browser-webapp .tabbar button[data-view="finances"] {
+    order: 4 !important;
+  }
+}
+
+/* v45 compact mobile polish */
+.topbar,
+body.browser-webapp .topbar,
+body.browser-webapp .topbar,
+body.tg-webapp .topbar {
+  min-height: 58px !important;
+  margin-bottom: 10px !important;
+  padding: 7px 9px !important;
+  border-radius: 16px !important;
+}
+
+.brand-lockup {
+  grid-template-columns: 40px minmax(0, 1fr) !important;
+  gap: 0 8px !important;
+}
+
+.brand-mark,
+body.tg-webapp .brand-mark,
+body.browser-webapp .brand-mark {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 13px !important;
+}
+
+.brand-lockup h1 {
+  font-size: clamp(22px, 6vw, 28px) !important;
+  line-height: 1 !important;
+}
+
+.brand-lockup p,
+.topbar-copy p {
+  font-size: 10px !important;
+  line-height: 1 !important;
+}
+
+.topbar-actions {
+  gap: 6px !important;
+}
+
+.topbar-actions .icon-button,
+.topbar .icon-button {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  border-radius: 13px !important;
+}
+
+.calendar-panel .premium-screen-head {
+  padding-left: 10px !important;
+}
+
+.calendar-title-block h2 {
+  padding-left: 0 !important;
+}
+
+.premium-screen:not(.students-screen) > .premium-screen-head,
+.finance-screen > .premium-screen-head {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  justify-items: stretch !important;
+  text-align: left !important;
+}
+
+.premium-screen:not(.students-screen) > .premium-screen-head > div,
+.finance-screen > .premium-screen-head > div {
+  min-width: 0 !important;
+  text-align: left !important;
+}
+
+.premium-screen:not(.students-screen) > .premium-screen-head h2,
+.finance-screen > .premium-screen-head h2 {
+  font-size: clamp(25px, 6.4vw, 34px) !important;
+  text-align: left !important;
+}
+
+.calendar-main-column {
+  padding: 8px !important;
+}
+
+.calendar-day {
+  padding: 8px !important;
+}
+
+.timeline-list {
+  gap: 6px !important;
+}
+
+.lesson-row,
+.student-lessons-section .lesson-row,
+.drawer-panel[data-view="student-detail"] .lesson-row {
+  grid-template-columns: 60px minmax(0, 1fr) 82px !important;
+  gap: 8px !important;
+  min-height: 64px !important;
+  padding: 7px 10px !important;
+  border-radius: 14px !important;
+}
+
+.lesson-row time,
+.drawer-panel[data-view="student-detail"] .lesson-row time {
+  width: auto !important;
+  min-width: 0 !important;
+  padding-right: 8px !important;
+  font-size: clamp(22px, 6vw, 27px) !important;
+  line-height: 1 !important;
+}
+
+.lesson-main,
+.drawer-panel[data-view="student-detail"] .lesson-main {
+  gap: 3px !important;
+  padding-left: 0 !important;
+}
+
+.lesson-main strong,
+.lesson-student-name,
+.drawer-panel[data-view="student-detail"] .lesson-row strong {
+  display: block !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  font-size: clamp(15px, 4.1vw, 18px) !important;
+  line-height: 1.05 !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  -webkit-line-clamp: 1 !important;
+  -webkit-box-orient: vertical !important;
+}
+
+.lesson-main p,
+.lesson-meta,
+.drawer-panel[data-view="student-detail"] .lesson-row p {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 5px !important;
+  overflow: hidden !important;
+  font-size: 11px !important;
+  line-height: 1.1 !important;
+  white-space: nowrap !important;
+}
+
+.lesson-statuses {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 4px !important;
+  overflow: hidden !important;
+}
+
+.lesson-statuses .status {
+  max-width: 98px !important;
+  min-height: 18px !important;
+  padding: 1px 6px !important;
+  border-radius: 999px !important;
+  font-size: 9px !important;
+  line-height: 15px !important;
+}
+
+.lesson-menu,
+.drawer-panel[data-view="student-detail"] .lesson-menu {
+  width: 82px !important;
+  min-width: 82px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  padding-right: 4px !important;
+}
+
+.lesson-menu .mini-button.micro,
+.drawer-panel[data-view="student-detail"] .lesson-menu .mini-button.micro {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  border-radius: 12px !important;
+  font-size: 15px !important;
+}
+
+.lesson-menu .mini-button.micro .ui-icon,
+.drawer-panel[data-view="student-detail"] .lesson-menu .mini-button.micro .ui-icon {
+  width: 17px !important;
+  height: 17px !important;
+}
+
+.homework-row {
+  min-height: 58px !important;
+  padding: 8px 10px !important;
+  border-radius: 14px !important;
+  gap: 8px !important;
+}
+
+.homework-row strong {
+  font-size: 15px !important;
+  line-height: 1.1 !important;
+}
+
+.homework-row p,
+.homework-row span,
+.homework-row small,
+.homework-row a {
+  font-size: 11px !important;
+  line-height: 1.15 !important;
+}
+
+.homework-row a:not(.attachment-link) {
+  display: inline !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--text-muted) !important;
+  box-shadow: none !important;
+}
+
+.homework-row .row-actions {
+  gap: 4px !important;
+}
+
+.homework-row .status {
+  min-height: 20px !important;
+  padding: 2px 7px !important;
+  font-size: 9px !important;
+}
+
+.duration-choice-field .duration-options {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+}
+
+.duration-choice-field button {
+  min-height: 38px !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 13px !important;
+  background: rgba(7, 12, 26, 0.74) !important;
+  color: var(--text-muted) !important;
+  font-weight: 900 !important;
+}
+
+.duration-choice-field button.active {
+  border-color: rgba(168, 121, 255, 0.62) !important;
+  background: rgba(124, 77, 255, 0.2) !important;
+  color: var(--purple-soft) !important;
+}
+
+.modal .edit-form {
+  padding-bottom: calc(112px + env(safe-area-inset-bottom)) !important;
+}
+
+.modal .edit-form > .primary-button[type="submit"] {
+  position: sticky !important;
+  bottom: max(8px, env(safe-area-inset-bottom)) !important;
+  z-index: 20 !important;
+  order: 999 !important;
+  grid-column: 1 / -1 !important;
+  min-height: 50px !important;
+  margin-top: 8px !important;
+  box-shadow: 0 18px 38px rgba(67, 40, 242, 0.38) !important;
+}
+
+@media (max-width: 430px) {
+  .lesson-row,
+  .student-lessons-section .lesson-row,
+  .drawer-panel[data-view="student-detail"] .lesson-row {
+    grid-template-columns: 58px minmax(0, 1fr) 76px !important;
+    min-height: 62px !important;
+    gap: 7px !important;
+    padding: 7px 8px !important;
+  }
+
+  .lesson-menu,
+  .drawer-panel[data-view="student-detail"] .lesson-menu {
+    width: 76px !important;
+    min-width: 76px !important;
+    gap: 6px !important;
+  }
+
+  .lesson-menu .mini-button.micro,
+  .drawer-panel[data-view="student-detail"] .lesson-menu .mini-button.micro {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+  }
+}
+
+/* v45 specificity lock: keep Telegram/browser mobile layout compact after legacy layers. */
+body.browser-webapp .calendar-panel > .premium-screen-head,
+body.tg-webapp .calendar-panel > .premium-screen-head {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  justify-items: start !important;
+  gap: 10px !important;
+  padding-left: 12px !important;
+  padding-right: 8px !important;
+}
+
+body.browser-webapp .calendar-panel .calendar-head-controls,
+body.tg-webapp .calendar-panel .calendar-head-controls {
+  order: -1 !important;
+  width: 100% !important;
+  justify-content: flex-start !important;
+  justify-items: start !important;
+}
+
+body.browser-webapp .calendar-panel .calendar-title-block,
+body.tg-webapp .calendar-panel .calendar-title-block {
+  width: 100% !important;
+  min-width: 0 !important;
+  justify-self: start !important;
+  text-align: left !important;
+}
+
+body.browser-webapp .calendar-panel .calendar-title-block h2,
+body.tg-webapp .calendar-panel .calendar-title-block h2 {
+  text-align: left !important;
+}
+
+body.browser-webapp .lesson-row,
+body.browser-webapp .student-lessons-section .lesson-row,
+body.browser-webapp .drawer-panel[data-view="student-detail"] .lesson-row,
+body.tg-webapp .lesson-row,
+body.tg-webapp .student-lessons-section .lesson-row,
+body.tg-webapp .drawer-panel[data-view="student-detail"] .lesson-row {
+  grid-template-columns: 58px minmax(0, 1fr) 76px !important;
+  gap: 7px !important;
+  min-height: 62px !important;
+  padding: 7px 8px !important;
+  border-radius: 14px !important;
+}
+
+body.browser-webapp .lesson-menu,
+body.browser-webapp .drawer-panel[data-view="student-detail"] .lesson-menu,
+body.tg-webapp .lesson-menu,
+body.tg-webapp .drawer-panel[data-view="student-detail"] .lesson-menu {
+  width: 76px !important;
+  min-width: 76px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: center !important;
+  gap: 6px !important;
+  padding-right: 4px !important;
+}
+
+body.browser-webapp .lesson-menu button.mini-button.micro,
+body.browser-webapp .drawer-panel[data-view="student-detail"] .lesson-menu button.mini-button.micro,
+body.tg-webapp .lesson-menu button.mini-button.micro,
+body.tg-webapp .drawer-panel[data-view="student-detail"] .lesson-menu button.mini-button.micro {
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  min-height: 30px !important;
+  padding: 0 !important;
+  border-radius: 11px !important;
+  font-size: 14px !important;
+}
+
+body.browser-webapp .topbar,
+body.tg-webapp .topbar {
+  min-height: 60px !important;
+  margin: 6px 4px 10px !important;
+  padding: 6px 8px !important;
+  border-radius: 15px !important;
+}
+
+body.browser-webapp .brand-lockup,
+body.browser-webapp .brand-lockup,
+body.tg-webapp .brand-lockup {
+  grid-template-columns: 34px minmax(0, 1fr) !important;
+  gap: 0 7px !important;
+}
+
+body.browser-webapp .brand-mark,
+body.browser-webapp .brand-mark,
+body.tg-webapp .brand-mark {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 11px !important;
+}
+
+body.browser-webapp .brand-lockup h1,
+body.tg-webapp .brand-lockup h1 {
+  font-size: clamp(18px, 5.3vw, 24px) !important;
+}
+
+body.browser-webapp .topbar-copy p,
+body.tg-webapp .topbar-copy p {
+  font-size: 9px !important;
+}
+
+body.browser-webapp .topbar .icon-button,
+body.tg-webapp .topbar .icon-button {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  border-radius: 11px !important;
+}
+
+/* v46 mobile corrections from real Telegram screenshots. */
+body.browser-webapp .topbar,
+body.tg-webapp .topbar {
+  min-height: 68px !important;
+  margin: 6px 0 10px !important;
+  padding: 8px 10px !important;
+  border-radius: 16px !important;
+}
+
+body.browser-webapp .brand-lockup,
+body.tg-webapp .brand-lockup {
+  grid-template-columns: 44px minmax(0, 1fr) !important;
+  grid-template-areas:
+    "mark name"
+    "mark title" !important;
+  column-gap: 10px !important;
+  row-gap: 1px !important;
+  align-items: center !important;
+}
+
+body.browser-webapp .brand-mark,
+body.tg-webapp .brand-mark {
+  grid-area: mark !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 44px !important;
+  border-radius: 14px !important;
+}
+
+body.browser-webapp .botai-logo-img,
+body.browser-webapp .botai-logo-img,
+body.tg-webapp .botai-logo-img {
+  width: 34px !important;
+  height: 34px !important;
+}
+
+body.browser-webapp .brand-lockup p,
+body.browser-webapp .brand-lockup p,
+body.tg-webapp .brand-lockup p {
+  grid-area: name !important;
+  margin: 0 !important;
+  color: var(--text-main) !important;
+  font-size: clamp(19px, 5vw, 22px) !important;
+  font-weight: 950 !important;
+  letter-spacing: 0 !important;
+  line-height: 1 !important;
+  text-transform: none !important;
+}
+
+body.browser-webapp .brand-lockup p span,
+body.tg-webapp .brand-lockup p span {
+  color: var(--purple-soft) !important;
+}
+
+body.browser-webapp .brand-lockup h1,
+body.browser-webapp .brand-lockup h1,
+body.tg-webapp .brand-lockup h1 {
+  grid-area: title !important;
+  margin: 0 !important;
+  color: var(--text-secondary) !important;
+  font-size: clamp(15px, 4.2vw, 18px) !important;
+  font-weight: 850 !important;
+  line-height: 1.08 !important;
+  letter-spacing: 0 !important;
+}
+
+body.browser-webapp .topbar .icon-button,
+body.browser-webapp .topbar .icon-button,
+body.tg-webapp .topbar .icon-button {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  border-radius: 12px !important;
+}
+
+body.browser-webapp .lesson-row,
+body.browser-webapp .student-lessons-section .lesson-row,
+body.browser-webapp .drawer-panel[data-view="student-detail"] .lesson-row,
+body.tg-webapp .lesson-row,
+body.tg-webapp .student-lessons-section .lesson-row,
+body.tg-webapp .drawer-panel[data-view="student-detail"] .lesson-row {
+  grid-template-columns: 48px minmax(0, 1fr) 74px !important;
+  gap: 10px !important;
+  min-height: 58px !important;
+  padding: 6px 8px !important;
+}
+
+body.browser-webapp .lesson-row time,
+body.browser-webapp .drawer-panel[data-view="student-detail"] .lesson-row time,
+body.tg-webapp .lesson-row time,
+body.tg-webapp .drawer-panel[data-view="student-detail"] .lesson-row time {
+  width: 48px !important;
+  min-width: 48px !important;
+  padding-right: 8px !important;
+  font-size: clamp(18px, 5.2vw, 22px) !important;
+  line-height: 1 !important;
+  text-align: left !important;
+}
+
+body.browser-webapp .lesson-main,
+body.browser-webapp .drawer-panel[data-view="student-detail"] .lesson-main,
+body.tg-webapp .lesson-main,
+body.tg-webapp .drawer-panel[data-view="student-detail"] .lesson-main {
+  min-width: 0 !important;
+  padding-left: 2px !important;
+}
+
+body.browser-webapp .lesson-main strong,
+body.browser-webapp .lesson-student-name,
+body.browser-webapp .drawer-panel[data-view="student-detail"] .lesson-row strong,
+body.tg-webapp .lesson-main strong,
+body.tg-webapp .lesson-student-name,
+body.tg-webapp .drawer-panel[data-view="student-detail"] .lesson-row strong {
+  font-size: clamp(14px, 3.9vw, 16px) !important;
+  line-height: 1.05 !important;
+}
+
+body.browser-webapp .lesson-menu,
+body.browser-webapp .drawer-panel[data-view="student-detail"] .lesson-menu,
+body.tg-webapp .lesson-menu,
+body.tg-webapp .drawer-panel[data-view="student-detail"] .lesson-menu {
+  width: 74px !important;
+  min-width: 74px !important;
+  justify-content: flex-end !important;
+  padding-right: 2px !important;
+}
+
+body.browser-webapp .premium-next-card,
+body.tg-webapp .premium-next-card {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 132px !important;
+  grid-template-areas:
+    "label actions"
+    "time actions"
+    "name actions"
+    "meta actions" !important;
+  align-items: center !important;
+  gap: 5px 12px !important;
+  min-height: 0 !important;
+  padding: 16px !important;
+}
+
+body.browser-webapp .premium-next-card > span,
+body.tg-webapp .premium-next-card > span {
+  grid-area: label !important;
+}
+
+body.browser-webapp .premium-next-card > strong,
+body.tg-webapp .premium-next-card > strong {
+  grid-area: time !important;
+  font-size: clamp(36px, 11vw, 48px) !important;
+  line-height: 0.95 !important;
+}
+
+body.browser-webapp .premium-next-card > h3,
+body.tg-webapp .premium-next-card > h3 {
+  grid-area: name !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  font-size: clamp(20px, 5.4vw, 26px) !important;
+  line-height: 1.05 !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+body.browser-webapp .premium-next-card > p,
+body.tg-webapp .premium-next-card > p {
+  grid-area: meta !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+body.browser-webapp .premium-next-actions,
+body.tg-webapp .premium-next-actions {
+  grid-area: actions !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  align-self: center !important;
+  gap: 8px !important;
+  margin: 0 !important;
+  padding-top: 0 !important;
+}
+
+body.browser-webapp .premium-next-actions .primary-button,
+body.browser-webapp .premium-next-actions .mini-button,
+body.tg-webapp .premium-next-actions .primary-button,
+body.tg-webapp .premium-next-actions .mini-button {
+  width: 100% !important;
+  min-height: 38px !important;
+  padding-inline: 8px !important;
+  font-size: 13px !important;
+  line-height: 1.05 !important;
+}
+
+body.browser-webapp .modal .edit-form,
+body.tg-webapp .modal .edit-form {
+  padding-bottom: calc(92px + env(safe-area-inset-bottom)) !important;
+}
+
+body.browser-webapp .modal .edit-form > .primary-button[type="submit"],
+body.tg-webapp .modal .edit-form > .primary-button[type="submit"] {
+  position: fixed !important;
+  right: max(18px, env(safe-area-inset-right)) !important;
+  bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+  left: max(18px, env(safe-area-inset-left)) !important;
+  z-index: 80 !important;
+  min-height: 50px !important;
+  margin: 0 !important;
+}
+
+/* v47 critical Telegram fixes: scroll-safe modals, clearer dense cards, working compact sections. */
+body.tg-webapp .topbar {
+  width: calc(100% - 8px) !important;
+  min-height: 78px !important;
+  margin: 8px 4px 12px !important;
+  padding: 10px 12px !important;
+  border-radius: 17px !important;
+}
+
+body.tg-webapp .brand-lockup {
+  grid-template-columns: 52px minmax(0, 1fr) !important;
+  column-gap: 12px !important;
+}
+
+body.tg-webapp .brand-mark {
+  width: 52px !important;
+  height: 52px !important;
+  min-width: 52px !important;
+  min-height: 52px !important;
+  border-radius: 16px !important;
+}
+
+body.tg-webapp .botai-logo-img {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+body.tg-webapp .brand-lockup p {
+  font-size: clamp(21px, 5.8vw, 26px) !important;
+}
+
+body.tg-webapp .brand-lockup h1 {
+  font-size: clamp(17px, 4.8vw, 21px) !important;
+}
+
+body.tg-webapp .topbar .icon-button {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+}
+
+/* v48 interaction/layout fixes */
+html,
+body,
+#app {
+  scroll-behavior: auto !important;
+}
+
+.tabbar,
+.tabbar button,
+.bottom-nav,
+.bottom-nav button {
+  touch-action: manipulation !important;
+  pointer-events: auto !important;
+}
+
+.calendar-head-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: start !important;
+  gap: 8px !important;
+}
+
+.calendar-title-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.calendar-title-row h2 {
+  flex: 0 1 auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  font-size: clamp(29px, 7.8vw, 42px) !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+.calendar-title-row .calendar-modes {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  justify-content: flex-end !important;
+  gap: 6px !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+}
+
+.calendar-title-row .calendar-modes button {
+  min-width: 0 !important;
+  min-height: 36px !important;
+  height: 36px !important;
+  padding: 0 9px !important;
+  border-radius: 15px !important;
+  font-size: clamp(13px, 3.6vw, 16px) !important;
+  line-height: 1 !important;
+}
+
+.calendar-head-row .calendar-head-controls {
+  display: none !important;
+}
+
+body.browser-webapp .modal .edit-form > .primary-button[type="submit"],
+body.tg-webapp .modal .edit-form > .primary-button[type="submit"],
+body.browser-webapp .modal .primary-button[type="submit"],
+body.tg-webapp .modal .primary-button[type="submit"] {
+  position: fixed !important;
+  left: max(12px, env(safe-area-inset-left)) !important;
+  right: max(12px, env(safe-area-inset-right)) !important;
+  bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+  z-index: 95 !important;
+  width: auto !important;
+  max-width: none !important;
+  min-height: 52px !important;
+  margin: 0 !important;
+  border-radius: 18px !important;
+  opacity: 0.84 !important;
+  box-shadow: 0 16px 34px rgba(58, 29, 220, 0.34) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+
+.status-wheel-section {
+  padding-bottom: 18px !important;
+}
+
+.status-wheel-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+}
+
+.status-wheel-field {
+  min-width: 0 !important;
+}
+
+.status-wheel-field > span {
+  display: block !important;
+  margin-bottom: 8px !important;
+  color: var(--text-secondary) !important;
+  font-weight: 900 !important;
+}
+
+.status-wheel-select {
+  width: 100% !important;
+  height: 176px !important;
+  min-height: 176px !important;
+  padding: 44px 8px !important;
+  border-radius: 18px !important;
+  border: 1px solid rgba(128, 142, 171, 0.24) !important;
+  color: var(--text-primary) !important;
+  background:
+    linear-gradient(180deg, rgba(11, 16, 30, 0.9), rgba(20, 27, 45, 0.78)),
+    linear-gradient(180deg, transparent 0 38%, rgba(124, 77, 255, 0.18) 38% 62%, transparent 62% 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06) !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  line-height: 1.2 !important;
+  overflow-y: auto !important;
+  scroll-snap-type: y proximity !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.status-wheel-select option {
+  min-height: 34px !important;
+  padding: 10px 6px !important;
+  border-radius: 12px !important;
+  color: var(--text-secondary) !important;
+  background: transparent !important;
+  scroll-snap-align: center !important;
+}
+
+.status-wheel-select option:checked {
+  color: var(--purple-soft) !important;
+  background: rgba(124, 77, 255, 0.22) !important;
+}
+
+@media (max-width: 420px) {
+  .calendar-title-row {
+    gap: 7px !important;
+  }
+
+  .calendar-title-row h2 {
+    font-size: clamp(27px, 7.2vw, 34px) !important;
+  }
+
+  .calendar-title-row .calendar-modes button {
+    padding: 0 7px !important;
+    min-height: 34px !important;
+    height: 34px !important;
+    font-size: 13px !important;
+  }
+
+  .status-wheel-grid {
+    gap: 8px !important;
+  }
+}
+
+/* v52: lesson status rails, cleaner wheels and restored student progress chart spacing. */
+.lesson-row,
+.student-lessons-section .lesson-row,
+.drawer-panel[data-view="student-detail"] .lesson-row {
+  border-left: 4px solid rgba(158, 179, 255, 0.58) !important;
+}
+
+.lesson-row.ok,
+.student-lessons-section .lesson-row.ok,
+.drawer-panel[data-view="student-detail"] .lesson-row.ok {
+  border-left-color: rgba(88, 211, 143, 0.9) !important;
+}
+
+.lesson-row.warn,
+.student-lessons-section .lesson-row.warn,
+.drawer-panel[data-view="student-detail"] .lesson-row.warn {
+  border-left-color: rgba(251, 146, 60, 0.92) !important;
+}
+
+.lesson-row.bad,
+.student-lessons-section .lesson-row.bad,
+.drawer-panel[data-view="student-detail"] .lesson-row.bad {
+  border-left-color: rgba(248, 113, 113, 0.9) !important;
+}
+
+.lesson-row.muted,
+.student-lessons-section .lesson-row.muted,
+.drawer-panel[data-view="student-detail"] .lesson-row.muted {
+  border-left-color: rgba(134, 158, 255, 0.72) !important;
+}
+
+.status-wheel-section .status-wheel-select {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(10, 15, 27, 0.94) 0%,
+      rgba(10, 15, 27, 0.56) 24%,
+      rgba(13, 19, 33, 0.22) 42%,
+      rgba(13, 19, 33, 0.22) 58%,
+      rgba(10, 15, 27, 0.56) 76%,
+      rgba(10, 15, 27, 0.94) 100%
+    ),
+    linear-gradient(
+      180deg,
+      transparent 0 40%,
+      rgba(255, 255, 255, 0.06) 40% 60%,
+      transparent 60% 100%
+    ) !important;
+  box-shadow:
+    inset 0 34px 24px rgba(8, 13, 24, 0.56),
+    inset 0 -34px 24px rgba(8, 13, 24, 0.56),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+.status-wheel-section .status-wheel-option:not(.selected) {
+  color: rgba(166, 176, 199, 0.24) !important;
+}
+
+.student-detail-tabs {
+  margin-top: 14px !important;
+}
+
+.premium-student-detail .progress-chart-shell {
+  margin-top: 12px !important;
+}
+
+/* v49 Apple-like status wheels: compact selected chips, no oversized select boxes. */
+.status-wheel-section {
+  padding: 14px 12px 18px !important;
+}
+
+.status-wheel-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 12px !important;
+  align-items: start !important;
+}
+
+.status-wheel-field {
+  display: grid !important;
+  gap: 8px !important;
+  min-width: 0 !important;
+}
+
+.status-wheel-field > span {
+  margin: 0 !important;
+  color: var(--text-secondary) !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+}
+
+.status-wheel-select {
+  position: relative !important;
+  display: grid !important;
+  align-content: start !important;
+  gap: 4px !important;
+  width: 100% !important;
+  height: 154px !important;
+  min-height: 154px !important;
+  padding: 50px 4px !important;
+  overflow-y: auto !important;
+  border: 0 !important;
+  border-radius: 18px !important;
+  background:
+    linear-gradient(180deg, rgba(6, 10, 20, 0.96), rgba(10, 15, 27, 0.72) 32%, rgba(10, 15, 27, 0.72) 68%, rgba(6, 10, 20, 0.96)),
+    linear-gradient(180deg, transparent 0 36%, rgba(255,255,255,0.055) 36% 64%, transparent 64% 100%) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05) !important;
+  scroll-snap-type: y mandatory !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: none !important;
+}
+
+.status-wheel-select::-webkit-scrollbar {
+  display: none !important;
+}
+
+.status-wheel-option {
+  appearance: none !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: rgba(166, 176, 199, 0.46) !important;
+  font: inherit !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  scroll-snap-align: center !important;
+}
+
+.status-wheel-option span {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  min-height: 30px !important;
+  padding: 0 10px !important;
+  border: 1px solid transparent !important;
+  border-radius: 999px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.status-wheel-option.selected {
+  color: var(--text-primary) !important;
+  transform: scale(1.04) !important;
+}
+
+.status-wheel-option.selected span {
+  background: rgba(255, 255, 255, 0.045) !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.08) !important;
+}
+
+.status-wheel-option.tone-ok.selected span {
+  border-color: rgba(88, 211, 143, 0.82) !important;
+  color: #78e3a8 !important;
+}
+
+.status-wheel-option.tone-warn.selected span {
+  border-color: rgba(251, 191, 36, 0.86) !important;
+  color: #fbbf24 !important;
+}
+
+.status-wheel-option.tone-bad.selected span {
+  border-color: rgba(248, 113, 113, 0.86) !important;
+  color: #fca5a5 !important;
+}
+
+.status-wheel-option.tone-muted.selected span {
+  border-color: rgba(158, 179, 255, 0.72) !important;
+  color: #b5c4ff !important;
+}
+
+@media (max-width: 420px) {
+  .status-wheel-grid {
+    gap: 10px !important;
+  }
+
+  .status-wheel-option {
+    font-size: 12px !important;
+  }
+
+  .status-wheel-option span {
+    padding-inline: 8px !important;
+  }
+}
+
+body.browser-webapp .lesson-row,
+body.browser-webapp .student-lessons-section .lesson-row,
+body.browser-webapp .drawer-panel[data-view="student-detail"] .lesson-row,
+body.tg-webapp .lesson-row,
+body.tg-webapp .student-lessons-section .lesson-row,
+body.tg-webapp .drawer-panel[data-view="student-detail"] .lesson-row {
+  grid-template-columns: 60px minmax(0, 1fr) 72px !important;
+  gap: 14px !important;
+}
+
+body.browser-webapp .lesson-row time,
+body.browser-webapp .drawer-panel[data-view="student-detail"] .lesson-row time,
+body.tg-webapp .lesson-row time,
+body.tg-webapp .drawer-panel[data-view="student-detail"] .lesson-row time {
+  width: 60px !important;
+  min-width: 60px !important;
+  padding-right: 10px !important;
+  font-size: clamp(17px, 4.8vw, 20px) !important;
+}
+
+body.browser-webapp .lesson-main,
+body.tg-webapp .lesson-main {
+  padding-left: 0 !important;
+}
+
+.homework-segmented,
+.premium-screen[data-view="homeworks"] .segmented {
+  border-color: rgba(84, 95, 122, 0.36) !important;
+  background: rgba(13, 18, 31, 0.94) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 10px 24px rgba(2, 6, 18, 0.24) !important;
+}
+
+.homework-segmented .homework-filter-chip,
+.premium-screen[data-view="homeworks"] .segmented button {
+  border-width: 1px !important;
+  border-style: solid !important;
+  border-color: rgba(70, 81, 108, 0.42) !important;
+  background: rgba(20, 26, 40, 0.96) !important;
+  color: #bcc6da !important;
+  box-shadow: none !important;
+}
+
+.homework-segmented .homework-filter-chip--all,
+.premium-screen[data-view="homeworks"] .segmented > button:nth-child(1) {
+  border-color: rgba(104, 122, 156, 0.48) !important;
+  background: rgba(22, 28, 42, 0.98) !important;
+  color: #d8e2f7 !important;
+}
+
+.homework-segmented .homework-filter-chip--work,
+.premium-screen[data-view="homeworks"] .segmented > button:nth-child(2) {
+  border-color: rgba(211, 136, 58, 0.6) !important;
+  background: rgba(34, 26, 20, 0.98) !important;
+  color: #f0af67 !important;
+}
+
+.homework-segmented .homework-filter-chip--done,
+.premium-screen[data-view="homeworks"] .segmented > button:nth-child(3) {
+  border-color: rgba(74, 165, 126, 0.62) !important;
+  background: rgba(18, 31, 29, 0.98) !important;
+  color: #82dfb3 !important;
+}
+
+.homework-segmented .homework-filter-chip--overdue,
+.premium-screen[data-view="homeworks"] .segmented > button:nth-child(4) {
+  border-color: rgba(191, 83, 97, 0.62) !important;
+  background: rgba(36, 22, 28, 0.98) !important;
+  color: #ef8d9b !important;
+}
+
+.homework-segmented .homework-filter-chip.active,
+.premium-screen[data-view="homeworks"] .segmented button.active {
+  transform: none !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02) !important;
+}
+
+.homework-segmented .homework-filter-chip--all.active,
+.premium-screen[data-view="homeworks"] .segmented > button:nth-child(1).active {
+  border-color: rgba(166, 190, 236, 0.9) !important;
+  background: rgba(34, 42, 62, 0.98) !important;
+  color: #f4f8ff !important;
+  box-shadow: inset 0 0 0 1px rgba(198, 216, 255, 0.08), 0 0 0 1px rgba(116, 141, 188, 0.18) !important;
+}
+
+.homework-segmented .homework-filter-chip--work.active,
+.premium-screen[data-view="homeworks"] .segmented > button:nth-child(2).active {
+  border-color: rgba(246, 172, 88, 0.92) !important;
+  background: rgba(52, 35, 24, 0.98) !important;
+  color: #fff1de !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 219, 171, 0.07), 0 0 0 1px rgba(169, 109, 44, 0.2) !important;
+}
+
+.homework-segmented .homework-filter-chip--done.active,
+.premium-screen[data-view="homeworks"] .segmented > button:nth-child(3).active {
+  border-color: rgba(103, 214, 160, 0.9) !important;
+  background: rgba(24, 44, 38, 0.98) !important;
+  color: #f0fff8 !important;
+  box-shadow: inset 0 0 0 1px rgba(205, 255, 229, 0.06), 0 0 0 1px rgba(58, 125, 96, 0.22) !important;
+}
+
+.homework-segmented .homework-filter-chip--overdue.active,
+.premium-screen[data-view="homeworks"] .segmented > button:nth-child(4).active {
+  border-color: rgba(230, 106, 123, 0.92) !important;
+  background: rgba(53, 27, 35, 0.98) !important;
+  color: #fff1f4 !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 216, 224, 0.06), 0 0 0 1px rgba(144, 57, 69, 0.22) !important;
+}
+
+.homework-row .status,
+.premium-screen[data-view="homeworks"] .homework-row .status {
+  display: none !important;
+}
+
+.homework-row .status.work,
+.modal .button-options input[value="ожидание выполнения"]:checked + label,
+.modal .button-options input[value="в работе"]:checked + label {
+  border-color: rgba(251, 146, 60, 0.78) !important;
+  color: #fb923c !important;
+  box-shadow: inset 0 0 0 1px rgba(251, 146, 60, 0.22) !important;
+}
+
+.student-filter-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  width: fit-content !important;
+  min-height: 42px !important;
+  margin: 0 0 10px !important;
+  padding: 0 14px !important;
+  border: 1px solid rgba(168, 121, 255, 0.36) !important;
+  border-radius: 14px !important;
+  background: rgba(124, 77, 255, 0.13) !important;
+  color: var(--purple-soft) !important;
+  font-weight: 900 !important;
+}
+
+.student-filter-toggle .ui-icon {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.weekday-button-field .weekday-options {
+  display: grid !important;
+  grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.weekday-button-field .weekday-options label {
+  min-height: 46px !important;
+  padding: 0 !important;
+  justify-content: center !important;
+  text-align: center !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+}
+
+.student-filter-panel {
+  display: none !important;
+}
+
+.student-filter-panel.open {
+  display: block !important;
+}
+
+.student-filter-panel .premium-toolbar {
+  margin-bottom: 10px !important;
+}
+
+.premium-student-detail .premium-student-hero {
+  grid-template-columns: 44px 72px minmax(0, 1fr) 56px !important;
+  gap: 10px !important;
+}
+
+.premium-student-detail .premium-avatar.lg {
+  width: 68px !important;
+  height: 68px !important;
+  min-width: 68px !important;
+}
+
+.premium-student-detail .premium-student-title {
+  min-width: 0 !important;
+  padding-left: 8px !important;
+}
+
+.premium-student-detail .premium-student-title h2 {
+  max-width: 100% !important;
+  overflow: hidden !important;
+  font-size: clamp(27px, 7.6vw, 38px) !important;
+  line-height: 1.03 !important;
+  text-overflow: ellipsis !important;
+}
+
+.student-detail-tabs button {
+  cursor: pointer !important;
+}
+
+.student-tab-panel {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+.student-tab-panel .compact-details.is-open {
+  display: grid !important;
+  gap: 8px !important;
+}
+
+.modal .button-options input[value="ожидание выполнения"]:checked + label,
+.modal .button-options input[value="в работе"]:checked + label {
+  background: rgba(251, 146, 60, 0.12) !important;
+}
+
+body.browser-webapp .modal,
+body.tg-webapp .modal {
+  overscroll-behavior: contain !important;
+}
+
+body.browser-webapp .topbar,
+body.tg-webapp .topbar {
+  width: calc(100% - 8px) !important;
+  height: 78px !important;
+  min-height: 78px !important;
+  margin: 8px 4px 12px !important;
+  padding: 10px 12px !important;
+  border-radius: 17px !important;
+}
+
+body.browser-webapp .brand-lockup,
+body.tg-webapp .brand-lockup {
+  grid-template-columns: 52px minmax(0, 1fr) !important;
+  column-gap: 12px !important;
+}
+
+body.browser-webapp .brand-mark,
+body.tg-webapp .brand-mark {
+  width: 52px !important;
+  height: 52px !important;
+  min-width: 52px !important;
+  min-height: 52px !important;
+  border-radius: 16px !important;
+}
+
+body.browser-webapp .botai-logo-img,
+body.tg-webapp .botai-logo-img {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+body.browser-webapp .brand-lockup p,
+body.tg-webapp .brand-lockup p {
+  font-size: clamp(21px, 5.8vw, 26px) !important;
+}
+
+body.browser-webapp .brand-lockup h1,
+body.tg-webapp .brand-lockup h1 {
+  font-size: clamp(17px, 4.8vw, 21px) !important;
+}
+
+body.browser-webapp .topbar .icon-button,
+body.tg-webapp .topbar .icon-button {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+  min-height: 42px !important;
+}
+
+/* v50: status wheels select by scroll, with a lower Apple-like focus band. */
+.status-wheel-select {
+  height: 126px !important;
+  min-height: 126px !important;
+  gap: 2px !important;
+  padding: 48px 4px !important;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(3, 6, 13, 0.99) 0%,
+      rgba(3, 6, 13, 0.94) 18%,
+      rgba(9, 14, 25, 0.56) 39%,
+      rgba(9, 14, 25, 0.56) 61%,
+      rgba(3, 6, 13, 0.94) 82%,
+      rgba(3, 6, 13, 0.99) 100%
+    ),
+    linear-gradient(
+      180deg,
+      transparent 0 39%,
+      rgba(255, 255, 255, 0.07) 39% 61%,
+      transparent 61% 100%
+    ) !important;
+  box-shadow:
+    inset 0 42px 26px rgba(3, 6, 13, 0.82),
+    inset 0 -42px 26px rgba(3, 6, 13, 0.82),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.status-wheel-option {
+  min-height: 28px !important;
+  color: rgba(166, 176, 199, 0.3) !important;
+  font-size: 12px !important;
+  opacity: 0.58 !important;
+}
+
+.status-wheel-option span {
+  min-height: 22px !important;
+  padding: 0 8px !important;
+  border-width: 1px !important;
+}
+
+.status-wheel-option:not(.selected) span {
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.status-wheel-option.selected {
+  color: var(--text-primary) !important;
+  opacity: 1 !important;
+  transform: scale(1.02) !important;
+}
+
+.status-wheel-option.selected span {
+  min-height: 24px !important;
+  padding: 0 10px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+/* v51 profile, homework and wheel fixes. */
+.homework-row {
+  border-left-width: 4px !important;
+}
+
+.homework-row.homework-tone-ok,
+.homework-row.ok {
+  border-left-color: rgba(88, 211, 143, 0.9) !important;
+}
+
+.homework-row.homework-tone-warn,
+.homework-row.work,
+.homework-row.warn {
+  border-left-color: rgba(251, 146, 60, 0.92) !important;
+}
+
+.homework-row.homework-tone-bad,
+.homework-row.bad {
+  border-left-color: rgba(248, 113, 113, 0.9) !important;
+}
+
+.homework-row.homework-tone-muted,
+.homework-row.muted {
+  border-left-color: rgba(158, 179, 255, 0.62) !important;
+}
+
+.student-status-mark.warn {
+  border-color: rgba(251, 146, 60, 0.6) !important;
+  background: rgba(251, 146, 60, 0.12) !important;
+  color: #fb923c !important;
+}
+
+.premium-student-detail .premium-student-hero {
+  grid-template-columns: minmax(68px, 0.75fr) 74px minmax(0, 1.4fr) 52px !important;
+  align-items: center !important;
+  gap: 14px !important;
+  padding-inline: 14px !important;
+}
+
+.premium-student-detail .premium-back-button {
+  display: none !important;
+}
+
+.student-hero-facts {
+  display: grid !important;
+  gap: 5px !important;
+  min-width: 0 !important;
+  color: var(--text-secondary) !important;
+  font-size: clamp(11px, 3vw, 13px) !important;
+  font-weight: 900 !important;
+  line-height: 1.1 !important;
+  text-align: left !important;
+}
+
+.student-hero-facts span {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.premium-student-detail .premium-avatar.lg {
+  justify-self: end !important;
+}
+
+.premium-student-detail .premium-student-title {
+  padding-left: 0 !important;
+}
+
+.premium-student-detail .premium-student-title h2 {
+  font-size: clamp(26px, 7vw, 36px) !important;
+}
+
+.empty-next-lesson {
+  grid-template-columns: 1fr !important;
+  min-height: 0 !important;
+}
+
+.empty-next-lesson p {
+  color: var(--text-secondary) !important;
+  font-size: clamp(20px, 5.4vw, 28px) !important;
+  font-weight: 900 !important;
+}
+
+.empty-next-lesson strong,
+.empty-next-lesson em,
+.empty-next-lesson div {
+  display: none !important;
+}
+
+.student-small-stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+.student-small-stats .mock-test-card {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  text-align: left !important;
+}
+
+.editable-stat {
+  cursor: pointer !important;
+}
+
+.student-tab-panel .finance-strip,
+.finance-strip-card .finance-strip {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+.status-wheel-select {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(1, 3, 8, 0.99) 0%,
+      rgba(1, 3, 8, 0.96) 18%,
+      rgba(5, 9, 17, 0.72) 39%,
+      rgba(5, 9, 17, 0.72) 61%,
+      rgba(1, 3, 8, 0.96) 82%,
+      rgba(1, 3, 8, 0.99) 100%
+    ),
+    linear-gradient(
+      180deg,
+      transparent 0 40%,
+      rgba(255, 255, 255, 0.075) 40% 60%,
+      transparent 60% 100%
+    ) !important;
+  box-shadow:
+    inset 0 44px 28px rgba(1, 3, 8, 0.9),
+    inset 0 -44px 28px rgba(1, 3, 8, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.045) !important;
+}
+
+@media (max-width: 420px) {
+  .premium-student-detail .premium-student-hero {
+    grid-template-columns: minmax(58px, 0.68fr) 66px minmax(0, 1.35fr) 48px !important;
+    gap: 10px !important;
+  }
+
+  .premium-student-detail .premium-avatar.lg {
+    width: 62px !important;
+    height: 62px !important;
+    min-width: 62px !important;
+  }
+
+  .student-tab-panel .finance-strip,
+  .finance-strip-card .finance-strip {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* v53 final overrides: loaded last, keeps profile/homework/progress fixes active. */
+.homework-row {
+  border-left: 7px solid rgba(142, 162, 205, 0.34) !important;
+}
+
+.homework-row.homework-tone-ok,
+.homework-row.ok {
+  border-left-color: #4df29a !important;
+  box-shadow: inset 24px 0 30px -24px rgba(77, 242, 154, 0.92), -12px 0 26px -18px rgba(77, 242, 154, 0.8) !important;
+}
+
+.homework-row.homework-tone-warn,
+.homework-row.work,
+.homework-row.warn {
+  border-left-color: #ff9e39 !important;
+  box-shadow: inset 24px 0 30px -24px rgba(255, 158, 57, 0.94), -12px 0 26px -18px rgba(255, 158, 57, 0.82) !important;
+}
+
+.homework-row.homework-tone-bad,
+.homework-row.bad {
+  border-left-color: #ff4d61 !important;
+  box-shadow: inset 24px 0 30px -24px rgba(255, 77, 97, 0.94), -12px 0 26px -18px rgba(255, 77, 97, 0.82) !important;
+}
+
+.homework-row.homework-tone-muted,
+.homework-row.muted {
+  border-left-color: #7f8ba8 !important;
+}
+
+.lesson-row,
+.student-lessons-section .lesson-row,
+.drawer-panel[data-view="student-detail"] .lesson-row {
+  border-left-width: 7px !important;
+}
+
+.lesson-row.ok,
+.student-lessons-section .lesson-row.ok,
+.drawer-panel[data-view="student-detail"] .lesson-row.ok {
+  border-left-color: #4df29a !important;
+  box-shadow: inset 24px 0 30px -24px rgba(77, 242, 154, 0.92), -12px 0 26px -18px rgba(77, 242, 154, 0.8) !important;
+}
+
+.lesson-row.warn,
+.student-lessons-section .lesson-row.warn,
+.drawer-panel[data-view="student-detail"] .lesson-row.warn {
+  border-left-color: #ff9e39 !important;
+  box-shadow: inset 24px 0 30px -24px rgba(255, 158, 57, 0.94), -12px 0 26px -18px rgba(255, 158, 57, 0.82) !important;
+}
+
+.lesson-row.bad,
+.student-lessons-section .lesson-row.bad,
+.drawer-panel[data-view="student-detail"] .lesson-row.bad {
+  border-left-color: #ff4d61 !important;
+  box-shadow: inset 24px 0 30px -24px rgba(255, 77, 97, 0.94), -12px 0 26px -18px rgba(255, 77, 97, 0.82) !important;
+}
+
+.premium-student-detail .premium-student-hero {
+  grid-template-columns: minmax(84px, 112px) 68px minmax(0, 1fr) 42px !important;
+  grid-template-areas: "facts avatar title actions" !important;
+  column-gap: 12px !important;
+  row-gap: 0 !important;
+  padding: 12px 10px !important;
+}
+
+.premium-student-detail .premium-back-button {
+  display: none !important;
+}
+
+.premium-student-detail .student-hero-facts {
+  grid-area: facts !important;
+  display: grid !important;
+  gap: 5px !important;
+  align-self: center !important;
+  min-width: 0 !important;
+}
+
+.premium-student-detail .student-hero-facts span {
+  display: block !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  color: var(--text-muted) !important;
+  font-size: 12px !important;
+  line-height: 1.12 !important;
+}
+
+.premium-student-detail .premium-avatar.lg {
+  width: 68px !important;
+  height: 68px !important;
+  min-width: 68px !important;
+  justify-self: end !important;
+}
+
+.premium-student-detail .premium-student-title h2 {
+  font-size: clamp(30px, 8vw, 42px) !important;
+  line-height: 0.94 !important;
+}
+
+.premium-student-detail .premium-student-title .premium-student-meta {
+  display: none !important;
+}
+
+.student-finance-note {
+  display: grid !important;
+  gap: 7px !important;
+  margin-top: 10px !important;
+  padding: 10px 12px !important;
+  border: 1px solid rgba(142, 162, 205, 0.16) !important;
+  border-radius: 14px !important;
+  background: rgba(8, 12, 25, 0.58) !important;
+  color: var(--text-muted) !important;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+}
+
+.student-finance-note strong {
+  color: var(--text) !important;
+}
+
+.progress-chart-shell {
+  --progress-plot-bottom: 56px !important;
+  --progress-plot-top: 24px !important;
+  grid-template-columns: 54px minmax(0, 1fr) !important;
+  min-height: 280px !important;
+  height: 280px !important;
+  padding: 0 !important;
+}
+
+.progress-chart-caption {
+  display: none !important;
+}
+
+.progress-axis {
+  color: rgba(180, 186, 210, 0.9) !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+}
+
+.progress-chart {
+  gap: 18px !important;
+  padding: var(--progress-plot-top) 22px 14px 10px !important;
+  align-items: end !important;
+}
+
+.progress-chart .bar-wrap {
+  grid-template-rows: minmax(0, 1fr) 34px !important;
+  min-width: 58px !important;
+  flex: 0 0 58px !important;
+  gap: 10px !important;
+}
+
+.progress-chart .bar,
+.progress-chart .bar.low,
+.progress-chart .bar.mid,
+.progress-chart .bar.high {
+  width: 48px !important;
+  max-width: 48px !important;
+  border-radius: 14px 14px 5px 5px !important;
+  background: linear-gradient(180deg, #b59cff 0%, #8d78f2 36%, #5f68c9 68%, #394360 100%) !important;
+  opacity: 1 !important;
+  box-shadow: inset 0 1px 0 rgba(244, 241, 255, 0.22), 0 10px 24px rgba(115, 91, 245, 0.18) !important;
+}
+
+.progress-chart .bar-wrap span {
+  color: rgba(183, 189, 211, 0.92) !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+}
+
+@media (max-width: 430px) {
+  .premium-student-detail .premium-student-hero {
+    grid-template-columns: minmax(76px, 102px) 64px minmax(0, 1fr) 40px !important;
+    gap: 10px !important;
+  }
+
+  .premium-student-detail .student-hero-facts span {
+    font-size: 11px !important;
+  }
+
+  .premium-student-detail .premium-avatar.lg {
+    width: 64px !important;
+    height: 64px !important;
+    min-width: 64px !important;
+  }
+
+  .premium-student-detail .premium-student-title h2 {
+    font-size: clamp(28px, 9vw, 38px) !important;
+  }
+
+  .progress-chart-shell {
+    --progress-plot-bottom: 48px !important;
+    --progress-plot-top: 18px !important;
+    grid-template-columns: 42px minmax(0, 1fr) !important;
+    min-height: 236px !important;
+    height: 236px !important;
+  }
+
+  .progress-axis {
+    font-size: 12px !important;
+  }
+
+  .progress-chart {
+    gap: 12px !important;
+    padding: var(--progress-plot-top) 14px 10px 8px !important;
+    padding-right: 12px !important;
+  }
+
+  .progress-chart .bar-wrap {
+    grid-template-rows: minmax(0, 1fr) 28px !important;
+    min-width: 38px !important;
+    flex-basis: 38px !important;
+    gap: 8px !important;
+  }
+
+  .progress-chart .bar,
+  .progress-chart .bar.low,
+  .progress-chart .bar.mid,
+  .progress-chart .bar.high {
+    width: 36px !important;
+    max-width: 36px !important;
+    border-radius: 12px 12px 6px 6px !important;
+  }
+
+  .progress-chart .bar-wrap span {
+    font-size: 12px !important;
+  }
+}
+
+/* v63: keep bottom spacing owned by the shell only. */
+.app-shell,
+body.browser-webapp .app-shell,
+body.tg-webapp .app-shell {
+  padding-bottom: calc(84px + env(safe-area-inset-bottom)) !important;
+}
+
+#app,
+body.browser-webapp #app,
+body.tg-webapp #app {
+  padding-bottom: 0 !important;
+}
+
+#app:has(.fab-wrap),
+body.browser-webapp #app:has(.fab-wrap),
+body.tg-webapp #app:has(.fab-wrap) {
+  padding-bottom: calc(76px + env(safe-area-inset-bottom)) !important;
+}
+
+#app > section,
+.premium-dashboard,
+.premium-screen,
+.students-screen,
+.calendar-panel,
+.homeworks-screen,
+.finance-screen,
+.profile-screen,
+.drawer-panel,
+.premium-student-detail,
+body.browser-webapp #app > section,
+body.tg-webapp #app > section {
+  padding-bottom: 0 !important;
+}

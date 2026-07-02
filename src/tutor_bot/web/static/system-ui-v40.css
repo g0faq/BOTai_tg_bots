@@ -1,0 +1,423 @@
+/* BOTai CRM UI polish v40: compact headers, status icons, cleaner dense lists. */
+
+.topbar {
+  min-height: 76px !important;
+  padding: 11px 14px !important;
+}
+
+.brand-lockup {
+  flex: 1 1 auto !important;
+  display: grid !important;
+  grid-template-columns: 58px minmax(0, 1fr) !important;
+  grid-template-areas:
+    "mark name"
+    "mark title" !important;
+  column-gap: 12px !important;
+  row-gap: 2px !important;
+  align-items: center !important;
+}
+
+.brand-mark,
+body.tg-webapp .brand-mark,
+body.browser-webapp .brand-mark {
+  grid-area: mark !important;
+  flex: 0 0 58px !important;
+  width: 58px !important;
+  height: 58px !important;
+  min-width: 58px !important;
+  min-height: 58px !important;
+  border-radius: 18px !important;
+  padding: 0 !important;
+}
+
+.botai-logo-img {
+  width: 44px !important;
+  height: 44px !important;
+}
+
+.brand-lockup p {
+  grid-area: name !important;
+  font-size: 24px !important;
+  line-height: 26px !important;
+  letter-spacing: 0.08em !important;
+  margin: 0 !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+.brand-lockup h1 {
+  grid-area: title !important;
+  font-size: 22px !important;
+  line-height: 25px !important;
+  max-width: 100% !important;
+  color: var(--text-secondary) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.topbar-actions .icon-button {
+  width: 50px !important;
+  height: 50px !important;
+  min-width: 50px !important;
+}
+
+.premium-avatar i,
+.avatar i {
+  display: none !important;
+}
+
+.premium-schedule-row > div {
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.premium-schedule-row > div::after {
+  display: none !important;
+  content: none !important;
+}
+
+.premium-schedule-row strong,
+.premium-schedule-row span {
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.premium-schedule-row strong {
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 28px), transparent 100%) !important;
+  mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 28px), transparent 100%) !important;
+}
+
+.premium-schedule-row > .status,
+.premium-schedule-row .status {
+  z-index: 3 !important;
+  opacity: 1 !important;
+  filter: none !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+  background-clip: padding-box !important;
+}
+
+.students-screen .primary-button {
+  box-shadow: 0 10px 22px rgba(123, 77, 255, 0.18) !important;
+}
+
+.students-screen .primary-button::before,
+.students-screen .primary-button::after {
+  display: none !important;
+  content: none !important;
+}
+
+.premium-student-card,
+.student-card.compact-student.premium-student-card {
+  grid-template-columns: 52px minmax(0, 1fr) 38px 12px !important;
+  min-height: 84px !important;
+  padding: 10px 12px !important;
+}
+
+.premium-student-side,
+.student-card.compact-student.premium-student-card .premium-student-side {
+  width: 38px !important;
+  min-width: 38px !important;
+  justify-content: center !important;
+}
+
+.student-status-mark {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.student-status-mark svg {
+  width: 18px !important;
+  height: 18px !important;
+  stroke-width: 3 !important;
+}
+
+.student-status-mark.ok {
+  color: var(--success) !important;
+  border: 1px solid rgba(52, 224, 161, 0.55) !important;
+  background: rgba(52, 224, 161, 0.1) !important;
+}
+
+.student-status-mark.bad {
+  color: var(--danger) !important;
+  border: 1px solid rgba(255, 91, 107, 0.55) !important;
+  background: rgba(255, 91, 107, 0.1) !important;
+}
+
+.calendar-mode-summary {
+  display: none !important;
+}
+
+.calendar-action-rail.calendar-top-actions {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.calendar-action-rail.calendar-top-actions .calendar-action {
+  min-height: 54px !important;
+  padding: 10px 8px !important;
+  border-radius: 18px !important;
+}
+
+.calendar-action-rail.calendar-top-actions .calendar-action:nth-child(1),
+.calendar-action-rail.calendar-top-actions .calendar-action:nth-child(2) {
+  grid-column: span 3 !important;
+}
+
+.calendar-action-rail.calendar-top-actions .calendar-action:nth-child(n+3) {
+  grid-column: span 2 !important;
+}
+
+.calendar-action-rail.calendar-top-actions .calendar-action span {
+  font-size: 15px !important;
+  line-height: 18px !important;
+  white-space: nowrap !important;
+}
+
+.premium-student-hero {
+  grid-template-columns: 34px 52px minmax(0, 1fr) 36px !important;
+  grid-template-areas: "back avatar title actions" !important;
+  align-items: center !important;
+  min-height: 86px !important;
+  padding: 8px !important;
+  gap: 8px !important;
+}
+
+.premium-student-hero .premium-back-button {
+  grid-area: back !important;
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+}
+
+.premium-student-hero .premium-avatar {
+  grid-area: avatar !important;
+}
+
+.premium-student-title {
+  grid-area: title !important;
+  min-width: 0 !important;
+  text-align: left !important;
+}
+
+.premium-student-title h2 {
+  font-size: 25px !important;
+  line-height: 28px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.premium-student-title .premium-tags {
+  flex-wrap: nowrap !important;
+  justify-content: flex-start !important;
+  gap: 5px !important;
+  margin: 3px 0 1px !important;
+  overflow: hidden !important;
+}
+
+.premium-student-title .premium-tags span {
+  width: auto !important;
+  min-width: 0 !important;
+  min-height: 23px !important;
+  padding: 3px 8px !important;
+  font-size: 12px !important;
+  line-height: 15px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.premium-student-title p {
+  margin: 0 !important;
+  font-size: 14px !important;
+  line-height: 18px !important;
+}
+
+.premium-balance-card {
+  display: none !important;
+}
+
+.student-head-actions {
+  grid-area: actions !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 6px !important;
+}
+
+.student-head-actions .icon-button {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+}
+
+.student-lessons-section > summary {
+  display: block !important;
+  padding: 12px 14px !important;
+}
+
+.student-lessons-section > summary h3 {
+  margin: 0 !important;
+}
+
+.student-lessons-section .section-actions {
+  display: none !important;
+}
+
+.progress-chart-shell {
+  min-height: 226px !important;
+}
+
+.progress-chart {
+  grid-auto-columns: 36px !important;
+  gap: 18px !important;
+  justify-content: start !important;
+  padding-left: 34px !important;
+  padding-right: 18px !important;
+}
+
+.progress-chart .bar-wrap {
+  width: 36px !important;
+}
+
+.progress-chart .bar {
+  width: 28px !important;
+  border-radius: 14px 14px 5px 5px !important;
+}
+
+.plan-list {
+  gap: 8px !important;
+}
+
+.plan-row {
+  display: grid !important;
+  grid-template-columns: 38px minmax(0, 1fr) 76px !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 70px !important;
+  padding: 9px 10px !important;
+  border-radius: 18px !important;
+}
+
+.plan-row input[type="checkbox"] {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+}
+
+.plan-row span {
+  min-width: 0 !important;
+  display: block !important;
+}
+
+.plan-row strong,
+.plan-row small {
+  display: block !important;
+  max-width: 100% !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.plan-row strong {
+  font-size: 20px !important;
+  line-height: 24px !important;
+}
+
+.plan-row small {
+  font-size: 15px !important;
+  line-height: 19px !important;
+}
+
+.plan-actions {
+  display: grid !important;
+  grid-template-columns: 34px 34px !important;
+  gap: 6px !important;
+  justify-content: end !important;
+}
+
+.plan-actions .mini-button.micro {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+}
+
+@media (max-width: 380px) {
+  .topbar {
+    min-height: 70px !important;
+    padding: 9px 12px !important;
+  }
+
+  .brand-lockup {
+    grid-template-columns: 52px minmax(0, 1fr) !important;
+  }
+
+  .brand-mark,
+  body.tg-webapp .brand-mark,
+  body.browser-webapp .brand-mark {
+    flex-basis: 52px !important;
+    width: 52px !important;
+    height: 52px !important;
+    min-width: 52px !important;
+    min-height: 52px !important;
+  }
+
+  .botai-logo-img {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .brand-lockup p {
+    font-size: 21px !important;
+    line-height: 23px !important;
+  }
+
+  .brand-lockup h1 {
+    font-size: 19px !important;
+    line-height: 22px !important;
+  }
+
+  .premium-student-hero {
+    grid-template-columns: 32px 48px minmax(0, 1fr) 34px !important;
+    min-height: 80px !important;
+    gap: 6px !important;
+  }
+
+  .premium-student-title h2 {
+    font-size: 23px !important;
+    line-height: 26px !important;
+  }
+
+  .calendar-action-rail.calendar-top-actions {
+    gap: 7px !important;
+  }
+
+  .calendar-action-rail.calendar-top-actions .calendar-action span {
+    font-size: 13px !important;
+  }
+
+  .progress-chart {
+    grid-auto-columns: 32px !important;
+    gap: 14px !important;
+  }
+
+  .progress-chart .bar-wrap {
+    width: 32px !important;
+  }
+
+  .progress-chart .bar {
+    width: 25px !important;
+  }
+}

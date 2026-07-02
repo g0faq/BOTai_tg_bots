@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>БОТай CRM</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      html, body {
+        margin: 0;
+        min-height: 100%;
+        background:
+          radial-gradient(circle at 18% 8%, rgba(126, 166, 255, 0.18), transparent 32%),
+          radial-gradient(circle at 84% 0%, rgba(168, 121, 255, 0.16), transparent 28%),
+          linear-gradient(180deg, #07101f 0%, #05070b 48%, #070912 100%);
+        color: #f4f7fb;
+      }
+
+      body {
+        padding: 18px 14px calc(96px + env(safe-area-inset-bottom));
+      }
+
+      #root {
+        width: 100%;
+        max-width: 960px;
+        margin: 0 auto;
+      }
+
+      .boot-shell {
+        display: grid;
+        gap: 16px;
+      }
+
+      .boot-topbar,
+      .boot-loading {
+        border: 1px solid rgba(118, 140, 198, 0.2);
+        border-radius: 24px;
+        background: rgba(11, 18, 32, 0.9);
+        box-shadow: 0 22px 60px rgba(0, 0, 0, 0.28);
+      }
+
+      .boot-topbar {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 14px;
+        align-items: center;
+        padding: 18px;
+      }
+
+      .boot-mark {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(124, 77, 255, 0.28), rgba(73, 136, 255, 0.18));
+        display: grid;
+        place-items: center;
+        font-size: 22px;
+        font-weight: 800;
+      }
+
+      .boot-copy strong,
+      .boot-copy span {
+        display: block;
+      }
+
+      .boot-copy strong {
+        font-size: 18px;
+        line-height: 1.1;
+      }
+
+      .boot-copy span {
+        margin-top: 4px;
+        color: rgba(244, 247, 251, 0.72);
+        font-size: 14px;
+      }
+
+      .boot-loading {
+        display: grid;
+        gap: 12px;
+        justify-items: center;
+        padding: 28px 18px;
+        text-align: center;
+      }
+
+      .boot-spinner {
+        width: 42px;
+        height: 42px;
+        border: 3px solid rgba(244, 247, 251, 0.12);
+        border-top-color: #a879ff;
+        border-radius: 999px;
+        animation: boot-spin 0.9s linear infinite;
+      }
+
+      .boot-loading strong {
+        font-size: 18px;
+        line-height: 1.15;
+      }
+
+      .boot-loading p {
+        margin: 0;
+        color: rgba(244, 247, 251, 0.72);
+        font-size: 14px;
+        line-height: 1.45;
+      }
+
+      @keyframes boot-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+    <script src="/assets/telegram-web-app.js?v=20260405-local"></script>
+    <link rel="stylesheet" href="/assets/styles.css?v=20260621-browser-invite-v69" />
+    <link rel="stylesheet" href="/assets/system-ui-v39.css?v=20260615-system-ui-v39" />
+    <link rel="stylesheet" href="/assets/system-ui-v40.css?v=20260615-ui-polish-v40" />
+    <link rel="stylesheet" href="/assets/system-ui-v41.css?v=20260621-browser-invite-v69" />
+    <link rel="stylesheet" href="/assets/ui-fixes-v44.css?v=20260621-browser-invite-v69" />
+  </head>
+  <body>
+    <div id="root">
+      <div class="boot-shell app-shell">
+        <header class="topbar">
+          <div class="brand-lockup">
+            <button class="brand-mark" id="profile-button" type="button" aria-label="BOTай CRM"><img class="botai-logo-img" src="/assets/botai-logo.svg?v=20260621-browser-invite-v69" alt="" aria-hidden="true" /></button>
+            <p>БОТай <span>CRM</span></p>
+            <h1 id="screen-title">Личный кабинет</h1>
+          </div>
+          <div class="topbar-actions">
+            <button class="icon-button" id="profile-action-button" type="button" aria-label="Профиль">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+            </button>
+            <button class="icon-button" id="refresh-button" type="button" aria-label="Обновить">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3.8 11.2a8.2 8.2 0 0 1 13.8-5.5L20 8.1"/><path d="M20.2 4.1v4.3h-4.3"/><path d="M20.2 12.8a8.2 8.2 0 0 1-13.8 5.5L4 15.9"/><path d="M3.8 19.9v-4.3h4.3"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <main id="app" aria-live="polite">
+          <section class="loading-state boot-loading">
+            <div class="boot-spinner loader" aria-hidden="true"></div>
+            <strong>Подключаю кабинет...</strong>
+            <p>Первый запуск ссылки в браузере может занять несколько секунд.</p>
+          </section>
+        </main>
+
+        <nav class="tabbar" id="tabbar" aria-label="Разделы"></nav>
+      </div>
+    </div>
+    <script src="/assets/app.js?v=20260621-browser-invite-v69" defer></script>
+  </body>
+</html>

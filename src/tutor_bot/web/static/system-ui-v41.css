@@ -1,0 +1,2113 @@
+/* BOTai CRM dense desktop/mobile polish v41. Loaded last. */
+
+:root {
+  --space-page: 6px;
+  --space-card: 10px;
+  --space-section: 12px;
+  --space-card-gap: 8px;
+  --space-inner: 6px;
+}
+
+/* UI audit v43: fixes from live Telegram screenshots. Keep at EOF. */
+body::before {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  width: auto !important;
+  height: auto !important;
+  background:
+    radial-gradient(circle at 18% 4%, rgba(126, 166, 255, 0.16), transparent 32%),
+    radial-gradient(circle at 86% 0%, rgba(168, 121, 255, 0.12), transparent 28%),
+    linear-gradient(180deg, #07101f 0%, #05070b 46%, #070912 100%) !important;
+}
+
+body::after {
+  content: "" !important;
+  position: fixed !important;
+  top: auto !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  z-index: 44 !important;
+  height: calc(118px + env(safe-area-inset-bottom)) !important;
+  pointer-events: none !important;
+  background: linear-gradient(180deg, rgba(5, 7, 11, 0), rgba(5, 7, 11, 0.34) 38%, rgba(5, 7, 11, 0.88)) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(1.08) !important;
+  backdrop-filter: blur(10px) saturate(1.08) !important;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.55) 38%, black 100%) !important;
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.55) 38%, black 100%) !important;
+}
+
+body.modal-open::after {
+  display: none !important;
+}
+
+.topbar-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+#profile-action-button {
+  display: inline-grid !important;
+}
+
+#profile-action-button.active {
+  color: #a879ff !important;
+  border-color: rgba(168, 121, 255, 0.44) !important;
+  background: rgba(94, 56, 204, 0.24) !important;
+}
+
+.premium-stat span,
+.premium-stat small,
+.premium-attention span {
+  display: block !important;
+}
+
+.premium-stat {
+  min-height: 72px !important;
+  padding: 13px 14px !important;
+  align-content: center !important;
+}
+
+.premium-stat span,
+.premium-attention span {
+  margin: 0 0 5px !important;
+  color: var(--text-muted, #9aa3b7) !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+}
+
+.premium-stat strong,
+.premium-attention strong {
+  margin: 0 !important;
+  font-size: clamp(24px, 6.2vw, 32px) !important;
+  line-height: 1.02 !important;
+}
+
+.premium-attention {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+  min-height: 64px !important;
+  padding: 12px 14px !important;
+}
+
+.premium-attention span {
+  margin: 0 !important;
+  overflow: visible !important;
+  white-space: normal !important;
+}
+
+.premium-attention strong {
+  justify-self: end !important;
+}
+
+.premium-screen-head,
+.section-head,
+.compact-head {
+  align-items: center !important;
+}
+
+.premium-screen-head h2,
+.section-head h2,
+.section-head h3 {
+  margin: 0 !important;
+  line-height: 1.05 !important;
+}
+
+.student-profile-dashboard {
+  gap: 14px !important;
+}
+
+.premium-student-hero {
+  grid-template-columns: 38px 64px minmax(0, 1fr) 42px !important;
+  grid-template-areas: "back avatar title actions" !important;
+  gap: 9px !important;
+  min-height: 0 !important;
+  padding: 10px !important;
+  border-radius: 18px !important;
+}
+
+.premium-student-hero .premium-avatar.lg {
+  width: 64px !important;
+  height: 64px !important;
+  font-size: 23px !important;
+}
+
+.premium-student-title h2 {
+  font-size: clamp(24px, 7vw, 32px) !important;
+  line-height: 1.02 !important;
+  -webkit-line-clamp: 2 !important;
+}
+
+.premium-tags {
+  margin-top: 5px !important;
+}
+
+.premium-student-title p {
+  margin-top: 4px !important;
+}
+
+.student-head-actions .icon-button,
+.student-head-actions .mini-button {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+}
+
+.student-detail-tabs {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  min-height: auto !important;
+  padding: 4px !important;
+  gap: 4px !important;
+  border-radius: 17px !important;
+}
+
+.student-detail-tabs button {
+  min-height: 34px !important;
+  padding: 4px 6px !important;
+  font-size: 12.5px !important;
+  line-height: 1.05 !important;
+}
+
+.next-student-lesson {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  grid-template-areas:
+    "label date"
+    "time duration"
+    "status status"
+    "primary secondary" !important;
+  gap: 7px !important;
+  min-height: 0 !important;
+  padding: 12px !important;
+}
+
+.next-student-lesson > span,
+.next-student-lesson > p,
+.next-student-lesson > em {
+  align-self: center !important;
+}
+
+.next-student-lesson > strong {
+  font-size: clamp(42px, 13vw, 56px) !important;
+  line-height: 0.94 !important;
+}
+
+.next-student-lesson .primary-button,
+.next-student-lesson .mini-button {
+  min-height: 40px !important;
+  border-radius: 14px !important;
+}
+
+.student-stat-card {
+  margin-top: 4px !important;
+}
+
+.student-stat-layout {
+  display: grid !important;
+  grid-template-columns: 126px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 14px !important;
+}
+
+.student-stat-layout .circular-progress {
+  width: 120px !important;
+  height: 120px !important;
+}
+
+.student-stat-layout h3 {
+  font-size: clamp(18px, 5vw, 24px) !important;
+  line-height: 1.08 !important;
+}
+
+.student-small-stats {
+  margin-top: 12px !important;
+}
+
+.student-lessons-section,
+.student-homeworks-section {
+  padding: 12px !important;
+}
+
+.student-lessons-section > summary,
+.student-homeworks-section > summary {
+  display: flex !important;
+  min-height: 42px !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+}
+
+.student-lessons-section > summary h3,
+.student-homeworks-section > summary h3 {
+  margin: 0 !important;
+  font-size: clamp(21px, 6vw, 28px) !important;
+  line-height: 1.05 !important;
+}
+
+.student-homeworks-section:not([open]) > :not(summary),
+.student-lessons-section:not([open]) > :not(summary) {
+  display: none !important;
+}
+
+.timeline-list {
+  gap: 9px !important;
+}
+
+.lesson-row,
+.student-lessons-section .lesson-row,
+.drawer-panel[data-view="student-detail"] .lesson-row {
+  grid-template-columns: 82px minmax(0, 1fr) 48px !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 88px !important;
+  padding: 12px 10px !important;
+  overflow: hidden !important;
+}
+
+.lesson-row::after,
+.drawer-panel[data-view="student-detail"] .lesson-row::after,
+.lesson-main::after {
+  display: none !important;
+}
+
+.lesson-row time,
+.drawer-panel[data-view="student-detail"] .lesson-row time {
+  width: auto !important;
+  min-width: 0 !important;
+  padding-right: 8px !important;
+  font-size: clamp(25px, 7.4vw, 34px) !important;
+  line-height: 1 !important;
+  text-align: left !important;
+}
+
+.lesson-main,
+.drawer-panel[data-view="student-detail"] .lesson-main {
+  display: grid !important;
+  gap: 5px !important;
+  min-width: 0 !important;
+}
+
+.lesson-main strong,
+.drawer-panel[data-view="student-detail"] .lesson-row strong {
+  max-width: 100% !important;
+  font-size: clamp(18px, 5.6vw, 26px) !important;
+  line-height: 1.08 !important;
+  white-space: normal !important;
+  -webkit-line-clamp: 2 !important;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+.lesson-main p,
+.drawer-panel[data-view="student-detail"] .lesson-row p {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 5px !important;
+  font-size: 13px !important;
+  line-height: 1.15 !important;
+  white-space: normal !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+.lesson-statuses {
+  flex-wrap: wrap !important;
+  gap: 5px !important;
+}
+
+.lesson-statuses .status {
+  max-width: 128px !important;
+  min-height: 23px !important;
+  padding: 3px 8px !important;
+  font-size: 10.5px !important;
+}
+
+.lesson-menu,
+.drawer-panel[data-view="student-detail"] .lesson-menu {
+  width: 48px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 7px !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.lesson-menu .mini-button.micro,
+.drawer-panel[data-view="student-detail"] .lesson-menu .mini-button.micro {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  border-radius: 13px !important;
+  font-size: 18px !important;
+}
+
+.lesson-menu .lesson-pay-button {
+  color: #ffd176 !important;
+  border-color: rgba(255, 209, 118, 0.42) !important;
+}
+
+.homework-row {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+}
+
+.modal-backdrop {
+  align-items: flex-end !important;
+  padding: max(8px, env(safe-area-inset-top)) 6px 0 !important;
+}
+
+.modal {
+  width: min(100vw - 8px, 720px) !important;
+  max-height: min(92vh, 820px) !important;
+  border-radius: 24px 24px 0 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.modal .detail-head {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 12 !important;
+  min-height: 68px !important;
+  padding: 14px 18px 12px !important;
+}
+
+.modal h2,
+.modal .detail-head h2 {
+  max-width: calc(100% - 56px) !important;
+  font-size: clamp(25px, 7vw, 34px) !important;
+  line-height: 1.06 !important;
+}
+
+.modal .edit-form {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 12px !important;
+  padding: 14px 14px calc(136px + env(safe-area-inset-bottom)) !important;
+}
+
+.modal .form-section {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 10px !important;
+  padding: 18px 14px 14px !important;
+  border-radius: 18px !important;
+}
+
+.modal .form-section legend,
+.modal .button-field legend {
+  position: static !important;
+  float: none !important;
+  width: auto !important;
+  margin: 0 0 2px !important;
+  padding: 0 !important;
+  color: var(--text-muted, #9aa3b7) !important;
+  font-size: 14px !important;
+  line-height: 1.15 !important;
+}
+
+.modal label {
+  display: grid !important;
+  gap: 7px !important;
+  padding: 0 !important;
+}
+
+.modal label > span,
+.modal .button-field > span {
+  padding-left: 2px !important;
+  font-size: 13px !important;
+}
+
+.modal input,
+.modal select,
+.modal textarea {
+  min-height: 48px !important;
+  padding: 12px 14px !important;
+  border-radius: 15px !important;
+  font-size: 16px !important;
+  line-height: 1.2 !important;
+}
+
+.modal textarea {
+  min-height: 88px !important;
+}
+
+.modal .button-options {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.modal .button-options label {
+  min-height: 42px !important;
+  padding: 8px 10px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 14px !important;
+  font-size: 13px !important;
+  line-height: 1.08 !important;
+  text-align: center !important;
+}
+
+.modal .primary-button[type="submit"] {
+  position: sticky !important;
+  bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+  z-index: 14 !important;
+  min-height: 54px !important;
+  margin-top: 2px !important;
+  border-radius: 18px !important;
+}
+
+@media (max-width: 380px) {
+  .lesson-row,
+  .student-lessons-section .lesson-row,
+  .drawer-panel[data-view="student-detail"] .lesson-row {
+    grid-template-columns: 72px minmax(0, 1fr) 44px !important;
+    gap: 8px !important;
+  }
+
+  .lesson-menu,
+  .drawer-panel[data-view="student-detail"] .lesson-menu {
+    width: 44px !important;
+  }
+
+  .lesson-menu .mini-button.micro,
+  .drawer-panel[data-view="student-detail"] .lesson-menu .mini-button.micro {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+  }
+
+  .modal .button-options {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+body .modal form.edit-form {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 12px !important;
+}
+
+body .modal fieldset.form-section,
+body .modal fieldset.button-field {
+  display: flex !important;
+  flex: 0 0 auto !important;
+  flex-direction: column !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+body .modal fieldset.form-section > fieldset.button-field {
+  margin: 0 !important;
+}
+
+body .lesson-menu button.mini-button.micro,
+body.browser-webapp .lesson-menu button.mini-button.micro,
+body.tg-webapp .lesson-menu button.mini-button.micro,
+body .drawer-panel[data-view="student-detail"] .lesson-menu button.mini-button.micro {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  max-width: 38px !important;
+  max-height: 38px !important;
+  border-radius: 13px !important;
+  font-size: 18px !important;
+}
+
+@media (max-width: 380px) {
+  body .lesson-menu button.mini-button.micro,
+  body.browser-webapp .lesson-menu button.mini-button.micro,
+  body.tg-webapp .lesson-menu button.mini-button.micro,
+  body .drawer-panel[data-view="student-detail"] .lesson-menu button.mini-button.micro {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    max-width: 36px !important;
+    max-height: 36px !important;
+  }
+}
+
+html,
+body,
+#root,
+.app-shell,
+#app {
+  max-width: none !important;
+  overflow-x: hidden !important;
+}
+
+.app-shell {
+  width: 100% !important;
+  padding-inline: 4px !important;
+}
+
+#app,
+.premium-dashboard,
+.premium-screen,
+.students-screen,
+.calendar-panel,
+.finances-screen,
+.homeworks-screen,
+.profile-screen,
+.drawer-panel,
+.premium-student-detail {
+  width: 100% !important;
+  max-width: none !important;
+  padding-inline: 2px !important;
+  padding-bottom: calc(104px + env(safe-area-inset-bottom)) !important;
+  gap: 12px !important;
+}
+
+#app > section,
+.premium-card,
+.detail-section,
+.calendar-main-column,
+.closed-slots-panel,
+.premium-screen-head,
+.premium-hero,
+.premium-toolbar,
+.panel,
+.metric,
+.operations-history,
+.finance-day {
+  width: 100% !important;
+  max-width: none !important;
+  margin-inline: 0 !important;
+}
+
+body::before {
+  content: "" !important;
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 44 !important;
+  height: 150px !important;
+  pointer-events: none !important;
+  background: linear-gradient(180deg, rgba(7, 11, 20, 0), rgba(7, 11, 20, 0.82) 62%, rgba(7, 11, 20, 0.96)) !important;
+}
+
+body.modal-open::before {
+  display: none !important;
+}
+
+.topbar {
+  margin: 0 0 10px !important;
+}
+
+.premium-screen-head {
+  padding-inline: 2px !important;
+}
+
+.premium-screen-head h2,
+.calendar-title-block h2 {
+  font-size: clamp(34px, 9vw, 46px) !important;
+  line-height: 1 !important;
+}
+
+.tabbar,
+body.browser-webapp .tabbar,
+body.tg-webapp .tabbar {
+  left: 8px !important;
+  right: 8px !important;
+  bottom: calc(0px + env(safe-area-inset-bottom)) !important;
+  z-index: 60 !important;
+  height: 72px !important;
+  min-height: 72px !important;
+  padding: 5px !important;
+  border-radius: 22px !important;
+}
+
+.tabbar button,
+body.browser-webapp .tabbar button {
+  height: 60px !important;
+  min-height: 60px !important;
+  border-radius: 18px !important;
+}
+
+.tabbar button span,
+body.browser-webapp .tabbar button span {
+  font-size: 12px !important;
+  line-height: 14px !important;
+}
+
+.fab-wrap {
+  right: 12px !important;
+  bottom: calc(82px + env(safe-area-inset-bottom)) !important;
+  z-index: 58 !important;
+}
+
+.fab,
+body.browser-webapp .fab {
+  width: 58px !important;
+  height: 58px !important;
+  min-width: 58px !important;
+  min-height: 58px !important;
+}
+
+.premium-dashboard > .premium-card:has(.attention-item:only-child),
+.premium-dashboard > .premium-card:empty {
+  display: none !important;
+}
+
+.premium-hero-copy p {
+  white-space: normal !important;
+}
+
+.calendar-action-rail.calendar-top-actions {
+  gap: 6px !important;
+}
+
+.calendar-action-rail.calendar-top-actions .calendar-action {
+  min-height: 46px !important;
+  padding: 7px 5px !important;
+  border-radius: 15px !important;
+}
+
+.calendar-action-rail.calendar-top-actions .calendar-action:nth-child(n+3) {
+  min-height: 42px !important;
+}
+
+.calendar-action-rail.calendar-top-actions .calendar-action span {
+  font-size: 12px !important;
+  line-height: 14px !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.calendar-action-rail.calendar-top-actions .calendar-action .ui-icon {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.calendar-workspace,
+.calendar-main-column,
+.calendar-day,
+.timeline-list {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.calendar-main-column {
+  padding: 6px !important;
+  border-radius: 18px !important;
+}
+
+.calendar-day {
+  padding: 4px 0 !important;
+  gap: 6px !important;
+}
+
+.calendar-day > *,
+.timeline-list > * {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.calendar-day-title {
+  margin: 4px 0 8px !important;
+  padding-inline: 4px !important;
+  font-size: 19px !important;
+  line-height: 24px !important;
+  letter-spacing: 0.08em !important;
+}
+
+.timeline-list {
+  gap: 7px !important;
+}
+
+.lesson-row,
+.student-lessons-section .lesson-row,
+.drawer-panel[data-view="student-detail"] .lesson-row {
+  grid-template-columns: 58px minmax(0, 1fr) 28px !important;
+  align-items: center !important;
+  min-height: 84px !important;
+  gap: 6px !important;
+  padding: 6px !important;
+  border-radius: 16px !important;
+}
+
+.lesson-row time,
+.drawer-panel[data-view="student-detail"] .lesson-row time {
+  font-size: 24px !important;
+  line-height: 28px !important;
+  width: 58px !important;
+  min-width: 58px !important;
+  padding-right: 5px !important;
+}
+
+.lesson-main strong,
+.drawer-panel[data-view="student-detail"] .lesson-row strong {
+  font-size: 18px !important;
+  line-height: 21px !important;
+}
+
+.lesson-main p,
+.drawer-panel[data-view="student-detail"] .lesson-row p {
+  font-size: 12px !important;
+  line-height: 16px !important;
+}
+
+.lesson-statuses {
+  gap: 4px !important;
+  margin-top: 4px !important;
+}
+
+.lesson-statuses .status {
+  min-height: 22px !important;
+  max-width: 84px !important;
+  padding: 3px 6px !important;
+  font-size: 10px !important;
+  line-height: 14px !important;
+}
+
+.lesson-menu,
+.drawer-panel[data-view="student-detail"] .lesson-menu {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 28px !important;
+  min-width: 28px !important;
+  gap: 2px !important;
+}
+
+.lesson-menu button.mini-button.micro,
+.drawer-panel[data-view="student-detail"] .lesson-menu button.mini-button.micro {
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  max-width: 24px !important;
+  max-height: 24px !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  border-radius: 9px !important;
+}
+
+.lesson-menu button.mini-button.micro .ui-icon,
+.drawer-panel[data-view="student-detail"] .lesson-menu button.mini-button.micro .ui-icon {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+.next-student-lesson {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  grid-template-areas:
+    "label date"
+    "time duration"
+    "status status"
+    "primary secondary" !important;
+  gap: 5px !important;
+  padding: 10px !important;
+  border-radius: 18px !important;
+}
+
+.next-student-lesson > span { grid-area: label !important; }
+.next-student-lesson > p { grid-area: date !important; margin: 0 !important; align-self: center !important; }
+.next-student-lesson > strong { grid-area: time !important; font-size: clamp(42px, 13vw, 56px) !important; line-height: 0.92 !important; }
+.next-student-lesson > em { grid-area: duration !important; align-self: center !important; min-height: 34px !important; padding: 5px 11px !important; font-size: 17px !important; line-height: 21px !important; border-radius: 14px !important; }
+.next-student-lesson > div { grid-area: status !important; margin: 0 !important; }
+.next-student-lesson > div .status {
+  min-height: 24px !important;
+  padding: 3px 9px !important;
+  font-size: 11px !important;
+  line-height: 16px !important;
+}
+.next-student-lesson .primary-button { grid-area: primary !important; min-height: 38px !important; padding-inline: 8px !important; }
+.next-student-lesson .mini-button { grid-area: secondary !important; width: 100% !important; min-height: 38px !important; padding-inline: 8px !important; }
+
+.student-detail-tabs {
+  position: relative !important;
+  z-index: 6 !important;
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 4px !important;
+  min-height: 48px !important;
+  padding: 4px !important;
+  border-radius: 18px !important;
+  background: rgba(7, 11, 20, 0.72) !important;
+  overflow: visible !important;
+}
+
+.student-detail-tabs button {
+  min-height: 38px !important;
+  border-radius: 14px !important;
+  padding: 5px 4px !important;
+  font-size: 14px !important;
+  line-height: 16px !important;
+}
+
+.segmented {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+  padding: 8px !important;
+}
+
+.segmented button {
+  min-height: 40px !important;
+  padding: 8px !important;
+  border-radius: 14px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.homework-row {
+  grid-template-columns: minmax(0, 1fr) 112px !important;
+  min-height: 70px !important;
+  padding: 10px !important;
+}
+
+.homework-row .row-actions {
+  width: 112px !important;
+  min-width: 112px !important;
+}
+
+body.modal-open .tabbar,
+body.modal-open .fab-wrap,
+body.browser-webapp.modal-open .tabbar,
+body.tg-webapp.modal-open .tabbar,
+body.browser-webapp.modal-open .fab-wrap,
+body.tg-webapp.modal-open .fab-wrap {
+  display: none !important;
+}
+
+.modal-backdrop {
+  z-index: 1000 !important;
+  align-items: flex-end !important;
+  padding: 0 4px !important;
+  background: rgba(0, 0, 0, 0.34) !important;
+}
+
+.modal {
+  width: calc(100vw - 8px) !important;
+  max-width: none !important;
+  max-height: 94vh !important;
+  min-height: min(320px, 94vh) !important;
+  padding: 0 !important;
+  border-radius: 22px 22px 0 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.modal .modal-drag-handle {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 12 !important;
+  margin-top: 8px !important;
+}
+
+.modal .detail-head {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 11 !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 44px !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 18px 16px 12px !important;
+  background: linear-gradient(180deg, rgba(24, 31, 47, 0.98), rgba(24, 31, 47, 0.92)) !important;
+  backdrop-filter: blur(18px) !important;
+}
+
+.modal h2,
+.modal .detail-head h2 {
+  font-size: clamp(28px, 8vw, 38px) !important;
+  line-height: 1.02 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.modal .modal-head-actions .icon-button {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px !important;
+}
+
+.modal .edit-form {
+  width: 100% !important;
+  max-width: none !important;
+  padding: 12px 12px calc(76px + env(safe-area-inset-bottom)) !important;
+  gap: 10px !important;
+}
+
+.modal .form-section {
+  border-left: 2px solid rgba(123, 77, 255, 0.42) !important;
+  background: rgba(9, 14, 27, 0.52) !important;
+}
+
+.modal .form-section:nth-of-type(2n) {
+  border-left-color: rgba(46, 212, 183, 0.42) !important;
+}
+
+.modal label,
+.modal .full,
+.modal .form-section,
+.modal input,
+.modal select,
+.modal textarea {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.modal input,
+.modal select,
+.modal textarea {
+  min-height: 48px !important;
+  border-radius: 18px !important;
+  padding-inline: 14px !important;
+}
+
+.modal textarea {
+  min-height: 96px !important;
+}
+
+.modal label input[type="file"],
+.modal input[type="file"] {
+  display: flex !important;
+  align-items: center !important;
+  min-height: 58px !important;
+  padding: 12px !important;
+  border-radius: 22px !important;
+  cursor: pointer !important;
+}
+
+.modal .button-options {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+}
+
+.modal .button-options label {
+  min-height: 40px !important;
+  border-radius: 16px !important;
+  text-align: center !important;
+}
+
+.modal .primary-button[type="submit"] {
+  position: sticky !important;
+  bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+  z-index: 20 !important;
+  width: 100% !important;
+  min-height: 54px !important;
+  margin: 10px 0 0 !important;
+  box-shadow: 0 16px 42px rgba(85, 54, 255, 0.38) !important;
+}
+
+.free-slots-view {
+  padding: 8px 12px calc(76px + env(safe-area-inset-bottom)) !important;
+}
+
+.free-slot-day h3 {
+  position: sticky !important;
+  top: 86px !important;
+  z-index: 4 !important;
+  padding: 8px 0 !important;
+  background: rgba(19, 26, 41, 0.92) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.free-slot-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+}
+
+.free-slot-button {
+  min-height: 70px !important;
+  border-radius: 16px !important;
+  padding: 8px !important;
+}
+
+.closed-slots-panel {
+  padding: 10px !important;
+}
+
+.closed-slots-panel .section-head,
+.closed-slots-panel .section-head.compact-head {
+  position: static !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto auto !important;
+  gap: 8px !important;
+  padding: 8px !important;
+  border-radius: 16px !important;
+  background: rgba(9, 14, 27, 0.52) !important;
+}
+
+.closed-slot-list {
+  padding-bottom: calc(106px + env(safe-area-inset-bottom)) !important;
+}
+
+@media (max-width: 380px) {
+  .lesson-row,
+  .student-lessons-section .lesson-row,
+  .drawer-panel[data-view="student-detail"] .lesson-row {
+    grid-template-columns: 62px minmax(0, 1fr) 32px !important;
+    min-height: 88px !important;
+    padding: 7px !important;
+  }
+
+  .lesson-row time,
+  .drawer-panel[data-view="student-detail"] .lesson-row time {
+    width: 62px !important;
+    min-width: 62px !important;
+    font-size: 24px !important;
+    line-height: 28px !important;
+  }
+
+  .lesson-main strong,
+  .drawer-panel[data-view="student-detail"] .lesson-row strong {
+    font-size: 18px !important;
+    line-height: 21px !important;
+  }
+
+  .lesson-statuses .status {
+    max-width: 82px !important;
+  }
+
+  .student-detail-tabs button {
+    font-size: 12px !important;
+  }
+}
+
+/* Audit v42: screenshot fixes for g0_faq_bot and sam_zabot. Keep last. */
+#app,
+.premium-dashboard,
+.premium-screen,
+.students-screen,
+.calendar-panel,
+.finance-screen,
+.profile-screen,
+.drawer-panel,
+.premium-student-detail {
+  padding-bottom: calc(152px + env(safe-area-inset-bottom)) !important;
+}
+
+body::before {
+  height: 112px !important;
+  background: linear-gradient(180deg, rgba(7, 11, 20, 0), rgba(7, 11, 20, 0.5) 70%, rgba(7, 11, 20, 0.82)) !important;
+}
+
+.topbar {
+  border-radius: 16px !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+.brand-lockup h1 {
+  white-space: normal !important;
+  line-height: 1.1 !important;
+}
+
+.premium-screen-head h2,
+.calendar-title-block h2 {
+  font-size: clamp(28px, 7vw, 38px) !important;
+  line-height: 1.04 !important;
+}
+
+.premium-screen-head {
+  align-items: end !important;
+}
+
+.premium-hero {
+  grid-template-columns: 1fr !important;
+  gap: 10px !important;
+  padding: 14px !important;
+}
+
+.today-lessons-title {
+  display: grid !important;
+  gap: 2px !important;
+  font-size: inherit !important;
+  line-height: 1 !important;
+}
+
+.today-lessons-title span {
+  color: var(--muted) !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+}
+
+.today-lessons-title strong {
+  color: var(--text) !important;
+  font-size: clamp(30px, 9vw, 44px) !important;
+  line-height: 0.98 !important;
+}
+
+.premium-next-card {
+  padding: 14px !important;
+}
+
+.premium-next-actions {
+  gap: 8px !important;
+  padding-top: 2px !important;
+}
+
+.premium-next-actions .primary-button,
+.premium-next-actions .mini-button,
+.next-student-lesson .primary-button,
+.next-student-lesson .mini-button {
+  min-height: 42px !important;
+}
+
+.secondary-action,
+.ghost-action {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.055) !important;
+  color: var(--text-secondary, #b8c2d3) !important;
+}
+
+.primary-soft-action {
+  border-color: rgba(139, 224, 199, 0.36) !important;
+  background: rgba(139, 224, 199, 0.14) !important;
+  color: var(--accent) !important;
+}
+
+.premium-action-grid {
+  gap: 8px !important;
+}
+
+.premium-action-grid button {
+  min-height: 60px !important;
+}
+
+.segmented {
+  background: rgba(255, 255, 255, 0.035) !important;
+}
+
+.segmented button {
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+  color: var(--text-secondary, #aeb7c8) !important;
+  font-weight: 750 !important;
+}
+
+.segmented button.active {
+  border-color: rgba(139, 224, 199, 0.55) !important;
+  background: rgba(139, 224, 199, 0.16) !important;
+  color: var(--accent) !important;
+}
+
+.homework-row {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  min-height: 76px !important;
+  align-items: start !important;
+  padding: 11px !important;
+  border-left: 3px solid rgba(139, 224, 199, 0.38) !important;
+}
+
+.homework-row .homework-main,
+.homework-row > div:first-child {
+  min-width: 0 !important;
+}
+
+.homework-row p,
+.homework-row span,
+.homework-row small,
+.homework-row a {
+  display: block !important;
+  overflow: visible !important;
+  white-space: normal !important;
+  text-overflow: clip !important;
+  line-height: 1.35 !important;
+}
+
+.homework-row .row-actions {
+  width: auto !important;
+  min-width: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+}
+
+.homework-row .status {
+  max-width: 88px !important;
+  min-height: 19px !important;
+  padding: 2px 6px !important;
+  border-width: 1px !important;
+  font-size: 9.5px !important;
+  line-height: 13px !important;
+}
+
+.homework-more-button {
+  opacity: 0.72 !important;
+}
+
+.calendar-head-controls {
+  min-width: 0 !important;
+}
+
+.calendar-modes,
+.premium-chip-row.calendar-modes {
+  display: flex !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  padding-bottom: 2px !important;
+  scrollbar-width: none !important;
+}
+
+.calendar-modes::-webkit-scrollbar {
+  display: none !important;
+}
+
+.calendar-action-rail.calendar-top-actions {
+  display: flex !important;
+  overflow-x: auto !important;
+  padding: 5px !important;
+  scrollbar-width: none !important;
+}
+
+.calendar-action-rail.calendar-top-actions::-webkit-scrollbar {
+  display: none !important;
+}
+
+.calendar-action-rail.calendar-top-actions .calendar-action {
+  flex: 0 0 auto !important;
+  min-width: 92px !important;
+  min-height: 38px !important;
+  padding: 6px 9px !important;
+}
+
+.calendar-day-title {
+  align-items: baseline !important;
+  margin-top: 6px !important;
+  font-size: 16px !important;
+  line-height: 20px !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+.calendar-day-title span {
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: normal !important;
+}
+
+.calendar-day-title strong {
+  align-self: baseline !important;
+  font-size: 13px !important;
+}
+
+.lesson-row,
+.student-lessons-section .lesson-row,
+.drawer-panel[data-view="student-detail"] .lesson-row {
+  grid-template-columns: 54px minmax(0, 1fr) 32px !important;
+  min-height: 82px !important;
+  gap: 7px !important;
+}
+
+.lesson-row time,
+.drawer-panel[data-view="student-detail"] .lesson-row time {
+  width: 54px !important;
+  min-width: 54px !important;
+  padding-right: 8px !important;
+  font-size: 21px !important;
+  line-height: 25px !important;
+}
+
+.lesson-main strong,
+.drawer-panel[data-view="student-detail"] .lesson-row strong {
+  font-size: 17px !important;
+  line-height: 21px !important;
+  white-space: normal !important;
+}
+
+.lesson-menu,
+.drawer-panel[data-view="student-detail"] .lesson-menu {
+  width: 32px !important;
+  min-width: 32px !important;
+  gap: 4px !important;
+}
+
+.lesson-menu button.mini-button.micro,
+.drawer-panel[data-view="student-detail"] .lesson-menu button.mini-button.micro {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+}
+
+.premium-avatar {
+  background: rgba(139, 224, 199, 0.12) !important;
+  border-color: rgba(139, 224, 199, 0.22) !important;
+}
+
+.premium-student-title h2 {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  line-height: 1.05 !important;
+}
+
+.student-detail-tabs {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  min-height: 42px !important;
+  padding: 3px !important;
+}
+
+.student-detail-tabs button {
+  min-height: 34px !important;
+  padding: 4px 3px !important;
+  font-size: 12px !important;
+  line-height: 14px !important;
+}
+
+.next-student-lesson > strong {
+  font-size: clamp(34px, 10vw, 44px) !important;
+}
+
+.student-stat-layout {
+  grid-template-columns: auto minmax(0, 1fr) !important;
+}
+
+.student-stat-layout h3 {
+  font-size: 15px !important;
+  line-height: 1.15 !important;
+}
+
+.student-stat-layout p {
+  font-size: 12px !important;
+}
+
+.finance-strip-card .mini-button,
+.section-head .mini-button[data-view-target="finances"] {
+  min-height: 34px !important;
+  padding-inline: 10px !important;
+}
+
+.finance-strip {
+  gap: 8px !important;
+}
+
+.finance-strip .premium-stat {
+  min-height: 72px !important;
+}
+
+.progress-chart-caption {
+  grid-column: 1 / -1 !important;
+  color: var(--muted) !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+
+.progress-chart .bar.low {
+  background: linear-gradient(180deg, #ffbf70, #ff7b7b) !important;
+}
+
+.progress-chart .bar.mid {
+  background: linear-gradient(180deg, #8fb6ff, #7ea6ff) !important;
+}
+
+.progress-chart .bar.high {
+  background: linear-gradient(180deg, #8be0c7, #34e0b0) !important;
+}
+
+.plan-empty .empty-mark {
+  display: grid !important;
+  place-items: center !important;
+}
+
+.plan-empty .empty-mark .ui-icon {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+.modal .detail-head {
+  padding: 14px 16px 10px !important;
+}
+
+.modal h2,
+.modal .detail-head h2 {
+  font-size: clamp(23px, 6.4vw, 31px) !important;
+  line-height: 1.08 !important;
+}
+
+.modal .edit-form {
+  padding: 12px 18px calc(144px + env(safe-area-inset-bottom)) !important;
+}
+
+.modal .form-section {
+  padding: 14px !important;
+  border-left-width: 1px !important;
+}
+
+.modal label {
+  gap: 7px !important;
+}
+
+.modal label > span,
+.modal .button-field legend,
+.modal .form-section legend {
+  padding-left: 2px !important;
+}
+
+.modal input,
+.modal select,
+.modal textarea {
+  min-height: 46px !important;
+  border-radius: 14px !important;
+  background: rgba(255, 255, 255, 0.055) !important;
+}
+
+.modal .button-options {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+.modal .button-options label {
+  min-height: 38px !important;
+  padding: 7px 6px !important;
+  border-radius: 13px !important;
+  font-size: 12px !important;
+  line-height: 14px !important;
+  white-space: normal !important;
+}
+
+.button-options input[value="запланировано"]:checked + label {
+  border-color: rgba(126, 166, 255, 0.76) !important;
+  color: #8fb6ff !important;
+  box-shadow: inset 0 0 0 1px rgba(126, 166, 255, 0.22) !important;
+}
+
+.button-options input[value="ожидает подтверждения"]:checked + label {
+  border-color: rgba(251, 191, 36, 0.76) !important;
+  color: #f0bd62 !important;
+}
+
+.button-options input[value="проведено"]:checked + label,
+.button-options input[value="оплачено"]:checked + label {
+  border-color: rgba(52, 211, 153, 0.76) !important;
+  color: #71d991 !important;
+}
+
+.button-options input[value="отменено"]:checked + label,
+.button-options input[value="не оплачено"]:checked + label {
+  border-color: rgba(248, 113, 113, 0.78) !important;
+  color: #ff7b7b !important;
+}
+
+.custom-upload-field input[type="file"],
+.modal .custom-upload-field input[type="file"],
+.modal label.custom-upload-field input[type="file"] {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  max-width: 1px !important;
+  max-height: 1px !important;
+  min-height: 1px !important;
+  padding: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.upload-control {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  min-height: 48px !important;
+  border: 1px solid rgba(139, 224, 199, 0.24) !important;
+  border-radius: 14px !important;
+  background: rgba(139, 224, 199, 0.09) !important;
+  color: var(--accent) !important;
+  cursor: pointer !important;
+}
+
+.upload-control .ui-icon {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.upload-file-list {
+  color: var(--muted) !important;
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+}
+
+.modal .primary-button[type="submit"] {
+  bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+  min-height: 52px !important;
+}
+
+.modal .danger-button.homework-delete-modal-button {
+  min-height: 42px !important;
+  background: rgba(248, 113, 113, 0.08) !important;
+  color: #ff9b9b !important;
+}
+
+.tabbar,
+body.browser-webapp .tabbar,
+body.tg-webapp .tabbar {
+  bottom: calc(6px + env(safe-area-inset-bottom)) !important;
+  height: 60px !important;
+  min-height: 60px !important;
+  padding: 4px !important;
+  border-radius: 18px !important;
+  background: rgba(11, 18, 32, 0.7) !important;
+  box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.24) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(1.1) !important;
+  backdrop-filter: blur(12px) saturate(1.1) !important;
+}
+
+.tabbar button,
+body.browser-webapp .tabbar button {
+  height: 50px !important;
+  min-height: 50px !important;
+  border-radius: 14px !important;
+  gap: 2px !important;
+}
+
+.tabbar button svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.tabbar button span,
+body.browser-webapp .tabbar button span {
+  font-size: 10.5px !important;
+  line-height: 12px !important;
+}
+
+.fab-wrap {
+  right: 14px !important;
+  bottom: calc(76px + env(safe-area-inset-bottom)) !important;
+}
+
+.fab,
+body.browser-webapp .fab {
+  width: 52px !important;
+  height: 52px !important;
+  min-width: 52px !important;
+  min-height: 52px !important;
+}
+
+@media (max-width: 380px) {
+  .premium-screen-head h2,
+  .calendar-title-block h2 {
+    font-size: 27px !important;
+  }
+
+  .lesson-row,
+  .student-lessons-section .lesson-row,
+  .drawer-panel[data-view="student-detail"] .lesson-row {
+    grid-template-columns: 52px minmax(0, 1fr) 30px !important;
+  }
+
+  .lesson-row time,
+  .drawer-panel[data-view="student-detail"] .lesson-row time {
+    width: 52px !important;
+    min-width: 52px !important;
+    font-size: 20px !important;
+  }
+
+  .modal .button-options label {
+    font-size: 11.5px !important;
+  }
+}
+
+/* UI audit v43 final override: live Telegram fixes. */
+body::before {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  width: auto !important;
+  height: auto !important;
+  background:
+    radial-gradient(circle at 18% 4%, rgba(126, 166, 255, 0.16), transparent 32%),
+    radial-gradient(circle at 86% 0%, rgba(168, 121, 255, 0.12), transparent 28%),
+    linear-gradient(180deg, #07101f 0%, #05070b 46%, #070912 100%) !important;
+}
+
+body::after {
+  content: "" !important;
+  position: fixed !important;
+  top: auto !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  z-index: 44 !important;
+  height: calc(118px + env(safe-area-inset-bottom)) !important;
+  pointer-events: none !important;
+  background: linear-gradient(180deg, rgba(5, 7, 11, 0), rgba(5, 7, 11, 0.34) 38%, rgba(5, 7, 11, 0.88)) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(1.08) !important;
+  backdrop-filter: blur(10px) saturate(1.08) !important;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.55) 38%, black 100%) !important;
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.55) 38%, black 100%) !important;
+}
+
+body.modal-open::after {
+  display: none !important;
+}
+
+.topbar-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+#profile-action-button {
+  display: inline-grid !important;
+}
+
+#profile-action-button.active {
+  color: #a879ff !important;
+  border-color: rgba(168, 121, 255, 0.44) !important;
+  background: rgba(94, 56, 204, 0.24) !important;
+}
+
+.tabbar,
+body.browser-webapp .tabbar,
+body.tg-webapp .tabbar {
+  height: 60px !important;
+  min-height: 60px !important;
+}
+
+.premium-stat span,
+.premium-stat small,
+.premium-attention span {
+  display: block !important;
+}
+
+.premium-stat {
+  min-height: 72px !important;
+  padding: 13px 14px !important;
+  align-content: center !important;
+}
+
+.premium-stat span,
+.premium-attention span {
+  margin: 0 0 5px !important;
+  color: var(--text-muted, #9aa3b7) !important;
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+}
+
+.premium-stat strong,
+.premium-attention strong {
+  margin: 0 !important;
+  font-size: clamp(24px, 6.2vw, 32px) !important;
+  line-height: 1.02 !important;
+}
+
+.premium-attention {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+  min-height: 64px !important;
+  padding: 12px 14px !important;
+}
+
+.premium-attention span {
+  margin: 0 !important;
+  overflow: visible !important;
+  white-space: normal !important;
+}
+
+.premium-attention strong {
+  justify-self: end !important;
+}
+
+.premium-screen-head,
+.section-head,
+.compact-head {
+  align-items: center !important;
+}
+
+.premium-screen-head h2,
+.section-head h2,
+.section-head h3 {
+  margin: 0 !important;
+  line-height: 1.05 !important;
+}
+
+.student-profile-dashboard {
+  gap: 14px !important;
+}
+
+.premium-student-hero {
+  grid-template-columns: 38px 64px minmax(0, 1fr) 42px !important;
+  grid-template-areas: "back avatar title actions" !important;
+  gap: 9px !important;
+  min-height: 0 !important;
+  padding: 10px !important;
+  border-radius: 18px !important;
+}
+
+.premium-student-hero .premium-avatar.lg {
+  width: 64px !important;
+  height: 64px !important;
+  font-size: 23px !important;
+}
+
+.premium-student-title h2 {
+  font-size: clamp(24px, 7vw, 32px) !important;
+  line-height: 1.02 !important;
+  -webkit-line-clamp: 2 !important;
+}
+
+.premium-tags {
+  margin-top: 5px !important;
+}
+
+.premium-student-title p {
+  margin-top: 4px !important;
+}
+
+.student-head-actions .icon-button,
+.student-head-actions .mini-button {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+}
+
+.student-detail-tabs {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  min-height: auto !important;
+  padding: 4px !important;
+  gap: 4px !important;
+  border-radius: 17px !important;
+}
+
+.student-detail-tabs button {
+  min-height: 34px !important;
+  padding: 4px 6px !important;
+  font-size: 12.5px !important;
+  line-height: 1.05 !important;
+}
+
+.next-student-lesson {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  grid-template-areas:
+    "label date"
+    "time duration"
+    "status status"
+    "primary secondary" !important;
+  gap: 7px !important;
+  min-height: 0 !important;
+  padding: 12px !important;
+}
+
+.next-student-lesson > span,
+.next-student-lesson > p,
+.next-student-lesson > em {
+  align-self: center !important;
+}
+
+.next-student-lesson > strong {
+  font-size: clamp(42px, 13vw, 56px) !important;
+  line-height: 0.94 !important;
+}
+
+.next-student-lesson .primary-button,
+.next-student-lesson .mini-button {
+  min-height: 40px !important;
+  border-radius: 14px !important;
+}
+
+.student-stat-card {
+  margin-top: 4px !important;
+}
+
+.student-stat-layout {
+  display: grid !important;
+  grid-template-columns: 126px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 14px !important;
+}
+
+.student-stat-layout .circular-progress {
+  width: 120px !important;
+  height: 120px !important;
+}
+
+.student-stat-layout h3 {
+  font-size: clamp(18px, 5vw, 24px) !important;
+  line-height: 1.08 !important;
+}
+
+.student-small-stats {
+  margin-top: 12px !important;
+}
+
+.student-lessons-section,
+.student-homeworks-section {
+  padding: 12px !important;
+}
+
+.student-lessons-section > summary,
+.student-homeworks-section > summary {
+  display: flex !important;
+  min-height: 42px !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+}
+
+.student-lessons-section > summary h3,
+.student-homeworks-section > summary h3 {
+  margin: 0 !important;
+  font-size: clamp(21px, 6vw, 28px) !important;
+  line-height: 1.05 !important;
+}
+
+.student-homeworks-section:not([open]) > :not(summary),
+.student-lessons-section:not([open]) > :not(summary) {
+  display: none !important;
+}
+
+.timeline-list {
+  gap: 9px !important;
+}
+
+.lesson-row,
+.student-lessons-section .lesson-row,
+.drawer-panel[data-view="student-detail"] .lesson-row {
+  grid-template-columns: 82px minmax(0, 1fr) 48px !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 88px !important;
+  padding: 12px 10px !important;
+  overflow: hidden !important;
+}
+
+.lesson-row::after,
+.drawer-panel[data-view="student-detail"] .lesson-row::after,
+.lesson-main::after {
+  display: none !important;
+}
+
+.lesson-row time,
+.drawer-panel[data-view="student-detail"] .lesson-row time {
+  width: auto !important;
+  min-width: 0 !important;
+  padding-right: 8px !important;
+  font-size: clamp(25px, 7.4vw, 34px) !important;
+  line-height: 1 !important;
+  text-align: left !important;
+}
+
+.lesson-main,
+.drawer-panel[data-view="student-detail"] .lesson-main {
+  display: grid !important;
+  gap: 5px !important;
+  min-width: 0 !important;
+}
+
+.lesson-main strong,
+.drawer-panel[data-view="student-detail"] .lesson-row strong {
+  max-width: 100% !important;
+  font-size: clamp(18px, 5.6vw, 26px) !important;
+  line-height: 1.08 !important;
+  white-space: normal !important;
+  -webkit-line-clamp: 2 !important;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+.lesson-main p,
+.drawer-panel[data-view="student-detail"] .lesson-row p {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 5px !important;
+  font-size: 13px !important;
+  line-height: 1.15 !important;
+  white-space: normal !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+.lesson-statuses {
+  flex-wrap: wrap !important;
+  gap: 5px !important;
+}
+
+.lesson-statuses .status {
+  max-width: 128px !important;
+  min-height: 23px !important;
+  padding: 3px 8px !important;
+  font-size: 10.5px !important;
+}
+
+.lesson-menu,
+.drawer-panel[data-view="student-detail"] .lesson-menu {
+  width: 48px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 7px !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.lesson-menu .mini-button.micro,
+.drawer-panel[data-view="student-detail"] .lesson-menu .mini-button.micro {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  min-height: 38px !important;
+  border-radius: 13px !important;
+  font-size: 18px !important;
+}
+
+.lesson-menu .lesson-pay-button {
+  color: #ffd176 !important;
+  border-color: rgba(255, 209, 118, 0.42) !important;
+}
+
+.homework-row {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+}
+
+.modal-backdrop {
+  align-items: flex-end !important;
+  padding: max(8px, env(safe-area-inset-top)) 6px 0 !important;
+}
+
+.modal {
+  width: min(100vw - 8px, 720px) !important;
+  max-height: min(92vh, 820px) !important;
+  border-radius: 24px 24px 0 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.modal .detail-head {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 12 !important;
+  min-height: 68px !important;
+  padding: 14px 18px 12px !important;
+}
+
+.modal h2,
+.modal .detail-head h2 {
+  max-width: calc(100% - 56px) !important;
+  font-size: clamp(25px, 7vw, 34px) !important;
+  line-height: 1.06 !important;
+}
+
+.modal .edit-form {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 12px !important;
+  padding: 14px 14px calc(136px + env(safe-area-inset-bottom)) !important;
+}
+
+.modal .form-section {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 10px !important;
+  padding: 18px 14px 14px !important;
+  border-radius: 18px !important;
+}
+
+.modal .form-section legend,
+.modal .button-field legend {
+  position: static !important;
+  float: none !important;
+  width: auto !important;
+  margin: 0 0 2px !important;
+  padding: 0 !important;
+  color: var(--text-muted, #9aa3b7) !important;
+  font-size: 14px !important;
+  line-height: 1.15 !important;
+}
+
+.modal label {
+  display: grid !important;
+  gap: 7px !important;
+  padding: 0 !important;
+}
+
+.modal label > span,
+.modal .button-field > span {
+  padding-left: 2px !important;
+  font-size: 13px !important;
+}
+
+.modal input,
+.modal select,
+.modal textarea {
+  min-height: 48px !important;
+  padding: 12px 14px !important;
+  border-radius: 15px !important;
+  font-size: 16px !important;
+  line-height: 1.2 !important;
+}
+
+.modal textarea {
+  min-height: 88px !important;
+}
+
+.modal .button-options {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.modal .button-options label {
+  min-height: 42px !important;
+  padding: 8px 10px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 14px !important;
+  font-size: 13px !important;
+  line-height: 1.08 !important;
+  text-align: center !important;
+}
+
+.modal .primary-button[type="submit"] {
+  position: sticky !important;
+  bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+  z-index: 14 !important;
+  min-height: 54px !important;
+  margin-top: 2px !important;
+  border-radius: 18px !important;
+}
+
+@media (max-width: 380px) {
+  .lesson-row,
+  .student-lessons-section .lesson-row,
+  .drawer-panel[data-view="student-detail"] .lesson-row {
+    grid-template-columns: 72px minmax(0, 1fr) 44px !important;
+    gap: 8px !important;
+  }
+
+  .lesson-menu,
+  .drawer-panel[data-view="student-detail"] .lesson-menu {
+    width: 44px !important;
+  }
+
+  .lesson-menu .mini-button.micro,
+  .drawer-panel[data-view="student-detail"] .lesson-menu .mini-button.micro {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+  }
+
+  .modal .button-options {
+    grid-template-columns: 1fr !important;
+  }
+}

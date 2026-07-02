@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>Tutor Cabinet</title>
+    <script src="assets/telegram-web-app.js?v=20260405-local"></script>
+    <link rel="stylesheet" href="assets/styles.css?v=20260613-hub-v18" />
+  </head>
+  <body>
+    <div id="root">
+      <div class="app-shell">
+        <header class="topbar">
+          <div class="brand-lockup">
+            <button class="brand-mark" id="profile-button" type="button" aria-label="BOTай CRM"><span class="botai-logo-mark" aria-hidden="true">Б</span></button>
+            <p>БОТай <span>CRM</span></p>
+            <h1 id="screen-title">Личный кабинет</h1>
+          </div>
+          <div class="topbar-actions">
+            <button class="icon-button" id="refresh-button" type="button" aria-label="Обновить">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v6h-6"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <main id="app" aria-live="polite">
+          <section class="loading-state">
+            <div class="loader"></div>
+            <p>Собираю кабинет...</p>
+          </section>
+        </main>
+
+        <nav class="tabbar" id="tabbar" aria-label="Разделы"></nav>
+      </div>
+    </div>
+    <script src="assets/app.js?v=20260615-backup-v25" type="module"></script>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+[Unit]
+Description=g0faq Hub Telegram bot
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/tutor-bot
+EnvironmentFile=/opt/tutor-bot/.env
+Environment=ENV_FILE=/opt/tutor-bot/.env
+Environment=PYTHONPATH=/opt/tutor-bot/src
+ExecStart=/opt/tutor-bot/.venv/bin/python -m tutor_bot.hub.bot
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,6 +1,6 @@
 const rawTelegramWebApp = window.Telegram?.WebApp;
 const tg = rawTelegramWebApp?.initData ? rawTelegramWebApp : null;
-const APP_VERSION = "20260621-browser-invite-v69";
+const APP_VERSION = "20260702-amvera-runtime-v70";
 const params = new URLSearchParams(window.location.search);
 const clientPathMatch = window.location.pathname.match(/^\/(client-\d+)(?:\/|$)/);
 const basePath = clientPathMatch ? `/${clientPathMatch[1]}` : "";
@@ -479,7 +479,7 @@ function updateProfileButton(payload) {
   profileButton.disabled = true;
   profileButton.title = "BOTай CRM";
   profileButton.setAttribute("aria-label", "BOTай CRM");
-  profileButton.innerHTML = '<img class="botai-logo-img" src="/assets/botai-logo.svg?v=20260621-browser-invite-v69" alt="" aria-hidden="true" />';
+  profileButton.innerHTML = '<img class="botai-logo-img" src="/assets/botai-logo.svg?v=20260702-amvera-runtime-v70" alt="" aria-hidden="true" />';
 }
 
 function renderTabs(tabs) {

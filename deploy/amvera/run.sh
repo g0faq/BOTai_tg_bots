@@ -8,8 +8,8 @@ PUBLIC_BASE_URL="${PUBLIC_BASE_URL:-}"
 PUBLIC_BASE_URL="${PUBLIC_BASE_URL%/}"
 G0_DATABASE_PATH="${G0_DATABASE_PATH:-/data/g0_faq_bot.sqlite3}"
 SAM_DATABASE_PATH="${SAM_DATABASE_PATH:-/data/sam_zabot.sqlite3}"
-# Temporary recovery deploy: keep web up while migrating the corrected g0 token into /data.
-RUN_TELEGRAM_BOTS=0
+# TimeWeb is decommissioned; Amvera is now the single runtime for Telegram polling.
+RUN_TELEGRAM_BOTS=1
 PORT="${PORT:-80}"
 
 : "${PUBLIC_BASE_URL:?Set PUBLIC_BASE_URL to the public HTTPS address}"
@@ -17,6 +17,11 @@ PORT="${PORT:-80}"
 : "${SAM_BOT_TOKEN:?Set SAM_BOT_TOKEN in Amvera secrets}"
 
 mkdir -p /data
+
+G0_BOT_TOKEN_FILE="${G0_BOT_TOKEN_FILE:-/data/g0_bot_token}"
+if [[ -s "$G0_BOT_TOKEN_FILE" ]]; then
+  G0_BOT_TOKEN="$(tr -d '\r\n' < "$G0_BOT_TOKEN_FILE")"
+fi
 
 export BOT_RUNTIME=server
 export BOT_TOKEN="$G0_BOT_TOKEN"

@@ -24,7 +24,7 @@ base_settings = load_settings()
 sam_settings = replace(
     base_settings,
     bot_token=_required_env("SAM_BOT_TOKEN"),
-    database_path=os.getenv("SAM_DATABASE_PATH", "/data/sam_zabot.sqlite3"),
+    database_path="/data/sam_zabot.sqlite3",
     webapp_url=f"{telegram_base_url}/client-694590118/",
     webapp_url_aliases=[],
 )

@@ -8,8 +8,9 @@ PUBLIC_BASE_URL="${PUBLIC_BASE_URL:-}"
 PUBLIC_BASE_URL="${PUBLIC_BASE_URL%/}"
 TELEGRAM_WEBAPP_BASE_URL="${TELEGRAM_WEBAPP_BASE_URL:-https://botai-g0faq.amvera.io}"
 TELEGRAM_WEBAPP_BASE_URL="${TELEGRAM_WEBAPP_BASE_URL%/}"
-G0_DATABASE_PATH="${G0_DATABASE_PATH:-/data/g0_faq_bot.sqlite3}"
-SAM_DATABASE_PATH="${SAM_DATABASE_PATH:-/data/sam_zabot.sqlite3}"
+# Amvera persistent storage is the only database source after the TimeWeb migration.
+G0_DATABASE_PATH="/data/g0_faq_bot.sqlite3"
+SAM_DATABASE_PATH="/data/sam_zabot.sqlite3"
 # TimeWeb is decommissioned; Amvera is now the single runtime for Telegram polling.
 RUN_TELEGRAM_BOTS=1
 PORT="${PORT:-80}"

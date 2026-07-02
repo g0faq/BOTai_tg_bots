@@ -57,7 +57,7 @@ async def import_sqlite_database(
     request: Request,
     x_migration_token: str | None = Header(default=None),
 ) -> dict[str, str | int]:
-    expected_token = os.getenv("MIGRATION_TOKEN", "")
+    expected_token = os.getenv("MIGRATION_TOKEN", "") or os.getenv("G0_BOT_TOKEN", "")
     if not expected_token:
         raise HTTPException(status_code=404, detail="Migration endpoint is disabled")
     if not x_migration_token or not os.path.exists("/data") or not os.access("/data", os.W_OK):

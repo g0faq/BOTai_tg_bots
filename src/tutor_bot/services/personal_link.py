@@ -69,3 +69,47 @@ def ensure_personal_invite(db, settings: Settings, role: str, student_id: int, n
             session_days=SESSION_DAYS,
         )
     return token
+
+
+# --------------------------------------------------------------------------- #
+# Ссылка чата: работает до регистрации
+# --------------------------------------------------------------------------- #
+#
+# Приглашение из browser_invites требует существующего ученика, а у нового
+# пользователя профиля ещё нет. Поэтому ссылка чата не хранится в базе
+# вовсе: telegram_id едет прямо в токене, а рядом — подпись. Сервер
+# пересчитывает подпись и получает id обратно.
+#
+# Что это даёт: одна и та же кнопка работает и до регистрации (открывает
+# анкету, привязанную к нужному чату), и после неё (открывает кабинет).
+
+CHAT_TOKEN_VERSION = "c1"
+
+
+def _chat_signature(settings: Settings, telegram_id: int) -> str:
+    message = f"chat:{CHAT_TOKEN_VERSION}:{int(telegram_id)}".encode()
+    digest = hmac.new(settings.bot_token.encode(), message, hashlib.sha256).digest()
+    return base64.urlsafe_b64encode(digest).decode().rstrip("=")[:32]
+
+
+def chat_token(settings: Settings, telegram_id: int) -> str:
+    """Постоянный токен чата: «<id>.<подпись>»."""
+    return f"{int(telegram_id)}.{_chat_signature(settings, telegram_id)}"
+
+
+def verify_chat_token(settings: Settings, token: str) -> int | None:
+    """Возвращает telegram_id, если подпись верна. Иначе None."""
+    raw = (token or "").strip()
+    if "." not in raw:
+        return None
+    head, _, signature = raw.partition(".")
+    if not head.isdigit():
+        return None
+    telegram_id = int(head)
+    if not hmac.compare_digest(signature, _chat_signature(settings, telegram_id)):
+        return None
+    return telegram_id
+
+
+def chat_link_url(settings: Settings, telegram_id: int) -> str:
+    return f"{settings.webapp_url.rstrip('/')}/login/chat/{chat_token(settings, telegram_id)}"

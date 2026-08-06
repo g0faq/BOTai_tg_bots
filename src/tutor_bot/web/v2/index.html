@@ -9,7 +9,9 @@
     <link rel="stylesheet" href="./styles/base.css" />
     <link rel="stylesheet" href="./styles/ui.css" />
     <style>
-      body { padding-bottom: calc(var(--tabbar) + env(safe-area-inset-bottom)); }
+      /* Запас снизу: таббар плюс кнопка «+», иначе она перекрывает
+         последнюю строку списка. */
+      body { padding-bottom: calc(var(--tabbar) + var(--fab) + var(--space-6) + env(safe-area-inset-bottom)); }
       #root { max-width: 560px; margin: 0 auto; }
       .app-body { display: block; }
       .toast-host { position: fixed; left: var(--gutter); right: var(--gutter);

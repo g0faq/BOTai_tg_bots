@@ -45,6 +45,7 @@ from tutor_bot.main import build_work_hours
 from tutor_bot.services.homework import submit_homework
 from tutor_bot.services.homework_lifecycle import split_homeworks
 from tutor_bot.services.payments import confirm_payment, reject_payment
+from tutor_bot.services.personal_link import verify_chat_token
 from tutor_bot.services.preparation import knowledge_status
 from tutor_bot.services.schedule_cleanup import apply_cleanup, plan_cleanup
 from tutor_bot.services.scheduling import (
@@ -376,6 +377,11 @@ def legacy_browser_cookie_name(settings: Settings) -> str:
     return f"{BROWSER_SESSION_COOKIE_PREFIX}_{suffix}"
 
 
+def chat_cookie_name(settings: Settings) -> str:
+    suffix = hashlib.sha256(browser_base_path(settings).encode()).hexdigest()[:8]
+    return f"tutor_chat_{suffix}"
+
+
 def browser_cookie_names(settings: Settings) -> list[str]:
     names = [browser_cookie_name(settings), legacy_browser_cookie_name(settings)]
     return list(dict.fromkeys(names))
@@ -457,6 +463,21 @@ def browser_session_account(request: Request, state: AppState) -> UserAccount | 
     )
 
 
+def chat_cookie_account(request: Request, state: AppState) -> UserAccount | None:
+    token = request.cookies.get(chat_cookie_name(state.settings))
+    if not token:
+        return None
+    telegram_id = verify_chat_token(state.settings, token)
+    if telegram_id is None:
+        return None
+    if telegram_id in state.settings.admin_telegram_ids:
+        return state.db.upsert_user(UserAccount(telegram_id=telegram_id, role=Role.ADMIN.value))
+    account = state.db.get_user(telegram_id)
+    if account is not None:
+        return account
+    return UserAccount(telegram_id=telegram_id, role="guest")
+
+
 def resolve_account_for_request(
     request: Request,
     state: AppState,
@@ -506,6 +527,13 @@ def resolve_account_for_request(
     browser_account = browser_session_account(request, state)
     if browser_account:
         return browser_account
+
+    # Ссылка чата: работает и до регистрации. Профиля может не быть — тогда
+    # отдаём гостя с правильным telegram_id, чтобы анкета привязалась к
+    # нужному чату.
+    chat_account = chat_cookie_account(request, state)
+    if chat_account:
+        return chat_account
 
     if dev_user_id and allow_local_dev_auth(request):
         account = state.db.get_user(int(dev_user_id))
@@ -1881,6 +1909,28 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             logging.exception("healthz: failed to read reminder state")
             payload["reminder_last_sent"] = "unknown"
         return payload
+
+    @app.get("/login/chat/{token}")
+    def accept_chat_link(token: str) -> RedirectResponse:
+        """Персональная ссылка чата. Работает и до регистрации.
+
+        В базе ничего не ищем: telegram_id зашит в сам токен и защищён
+        подписью. Ставим cookie и уводим в кабинет — дальше роль определит
+        resolve_account_for_request.
+        """
+        if verify_chat_token(state.settings, token) is None:
+            raise HTTPException(status_code=404, detail="Ссылка недействительна")
+        response = RedirectResponse(url=browser_entry_path(state.settings), status_code=303)
+        response.set_cookie(
+            chat_cookie_name(state.settings),
+            token,
+            max_age=BROWSER_SESSION_DAYS * 24 * 60 * 60,
+            httponly=True,
+            secure=browser_base_url(state.settings).startswith("https://"),
+            samesite="lax",
+            path=browser_base_path(state.settings),
+        )
+        return response
 
     @app.get("/login/{token}")
     def accept_browser_invite(token: str) -> RedirectResponse:

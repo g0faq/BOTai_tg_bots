@@ -1384,3 +1384,124 @@
 }
 .cleanup-preview { display: flex; flex-direction: column; gap: var(--space-2); }
 .form-error { color: var(--sem-debt-text); border-color: var(--sem-debt); }
+
+/* ======================================================================== */
+/* Обзор: пульс дня, лента дня, требует ответа                              */
+/* ======================================================================== */
+
+.pulse {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 14px var(--gutter) var(--space-3);
+  border-bottom: var(--hair) solid var(--border);
+}
+.pulse__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); }
+.pulse__cap {
+  font-size: var(--fs-caps);
+  letter-spacing: var(--tr-caps);
+  text-transform: uppercase;
+  font-weight: var(--fw-semibold);
+  color: var(--text-2);
+}
+.pulse__date { font-size: var(--fs-cap); color: var(--text-3); }
+.pulse__row { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-3); }
+/* Единственное крупное число продукта. */
+.pulse__sum {
+  font-size: var(--fs-sum);
+  line-height: var(--lh-sum);
+  letter-spacing: var(--tr-sum);
+  font-weight: var(--fw-medium);
+}
+.pulse__done { font-size: var(--fs-body); color: var(--text-2); }
+.pulse__meter { display: flex; align-items: center; gap: var(--space-2); }
+.pulse__track { flex: 1; height: 3px; background: var(--surface-2); display: block; position: relative; }
+.pulse__fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--sem-done); }
+.pulse__caption { font-size: var(--fs-caps); color: var(--text-3); }
+.pulse__cancelled { font-size: var(--fs-caps); color: var(--sem-debt); }
+
+/* Метка текущего времени — единственная анимация в продукте. */
+.now-line {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 24px;
+  padding: 0 var(--gutter);
+}
+.now-line__time { width: 44px; font-size: var(--fs-caps); color: var(--accent); }
+.now-line__dot {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  animation: now-pulse 2.6s ease-in-out infinite;
+}
+.now-line__rule { flex: 1; height: var(--hair); background: var(--accent); opacity: 0.5; }
+@keyframes now-pulse { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+
+.ribbon-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--row-lesson);
+  padding: 9px var(--gutter) 9px var(--notch-gutter);
+  border-bottom: var(--hair) solid var(--border-hair);
+}
+/* Прошедшее приглушается, но остаётся читаемым: день виден целиком. */
+.ribbon-row.is-past .ribbon-row__name,
+.ribbon-row.is-past .ribbon-row__hh { color: var(--text-2); }
+.ribbon-row.is-past .notch { opacity: 0.55; }
+
+.ribbon-row__time { display: flex; flex-direction: column; gap: 1px; }
+.ribbon-row__hh { font-size: var(--fs-body); }
+.ribbon-row__dur { font-size: var(--fs-caps); color: var(--state-off-text); }
+.ribbon-row__main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  text-align: left;
+  background: none;
+  color: inherit;
+}
+.ribbon-row__name {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ribbon-row__meta {
+  font-size: var(--fs-cap);
+  color: var(--text-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ribbon-row__tail { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.ribbon-row__price { font-size: var(--fs-meta); color: var(--text-2); }
+
+.attention {
+  position: relative;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--row-1);
+  padding: 0 var(--gutter) 0 var(--notch-gutter);
+  border-bottom: var(--hair) solid var(--border-hair);
+  text-align: left;
+  color: var(--text);
+}
+.attention__label { font-size: var(--fs-body); }
+.attention__count { font-size: var(--fs-body); color: var(--text-2); }
+.attention__chev { color: var(--state-off-text); }
+
+@media (max-width: 420px) {
+  .ribbon-row__tail .pill__label { display: none; }
+  .ribbon-row__tail .pill { padding: 0 var(--space-1); }
+}

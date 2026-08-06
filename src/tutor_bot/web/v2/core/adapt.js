@@ -243,32 +243,93 @@ export function adaptFinances(admin, { operationFilter = "" } = {}) {
 /* --- обзор репетитора ------------------------------------------------------ */
 
 export function adaptOverview(admin) {
-  const s = admin.summary || {};
-  const today = (admin.calendar || []).filter((l) => fmt.daysBetween(l.starts_at) === 0);
+  const sum = admin.summary || {};
+  const now = new Date();
+  const all = (admin.calendar || []).filter((l) => fmt.daysBetween(l.starts_at) === 0);
+  const today = all.filter((l) => !dict.isCancelledLesson(l.status));
   const conducted = today.filter((l) => l.status === dict.LESSON_STATUS.CONDUCTED).length;
-  const next = s.next_lesson || null;
+
+  const earned = today
+    .filter((l) => l.payment_status === dict.PAYMENT_STATUS.CONFIRMED)
+    .reduce((acc, l) => acc + lessonPrice(l), 0);
+  const planned = today.reduce((acc, l) => acc + lessonPrice(l), 0);
+
+  // Лента дня: занятия по времени, прошедшие приглушены. Метка «сейчас»
+  // встаёт перед первым будущим занятием — это единственная анимация в
+  // продукте, поэтому ставится ровно один раз.
+  const sorted = [...today].sort((a, b) => fmt.toDate(a.starts_at) - fmt.toDate(b.starts_at));
+  let nowPlaced = false;
+  const ribbon = sorted.map((l) => {
+    const starts = fmt.toDate(l.starts_at);
+    const isPast = starts < now;
+    const showNow = !isPast && !nowPlaced;
+    if (showNow) nowPlaced = true;
+    return {
+      id: l.id,
+      showNow,
+      isPast,
+      time: fmt.time(starts),
+      duration: fmt.minutes(l.duration_minutes),
+      name: l.student_name || "Занятие",
+      meta: [l.topic, admin.students?.find((s) => s.id === l.student_id)?.subject].filter(Boolean).join(" · "),
+      price: fmt.money(lessonPrice(l)),
+      lessonStatus: dict.lessonStatus(l.status),
+      paymentStatus: dict.paymentStatus(l.payment_status),
+    };
+  });
+
+  const attention = [
+    {
+      key: "pending",
+      label: "Заявки без ответа",
+      count: (admin.pending_lessons || []).length,
+      notch: notchOf(dict.lessonStatus(dict.LESSON_STATUS.PENDING)),
+      target: "calendar",
+    },
+    {
+      key: "toCheck",
+      label: "Оплаты на проверке",
+      count: ((admin.finances || {}).pending || []).length,
+      notch: notchOf(dict.paymentStatus(dict.PAYMENT_STATUS.STUDENT_MARKED)),
+      target: "finances",
+    },
+    {
+      key: "unpaid",
+      label: "Ждут оплаты",
+      count: ((admin.finances || {}).unpaid_lessons || []).length,
+      notch: notchOf(dict.paymentStatus(dict.PAYMENT_STATUS.UNPAID)),
+      target: "finances",
+    },
+    {
+      key: "homework",
+      label: "Домашки на проверку",
+      count: (admin.homeworks || []).filter(
+        (h) => h.status !== dict.HOMEWORK_STATUS.DONE && h.status !== dict.HOMEWORK_STATUS.CANCELLED,
+      ).length,
+      notch: notchOf(dict.homeworkStatus(dict.HOMEWORK_STATUS.WAITING)),
+      target: "homeworks",
+    },
+  ].filter((item) => item.count > 0);
+
   return {
-    todayCount: today.length,
+    dateLabel: `${fmt.weekdayShort(now).toLowerCase()}, ${fmt.dateLong(now)}`,
+    nowLabel: fmt.time(now),
+    money: fmt.money(planned),
+    moneyCaption: earned >= planned && planned > 0 ? "получено" : "к получению",
+    progress: planned > 0 ? Math.round(earned / planned * 100) : 0,
     conducted,
-    expected: fmt.money(s.expected_today_income ?? s.expected_income ?? 0),
-    next: next
-      ? {
-          when: fmt.time(next.starts_at),
-          name: next.student_name || "Занятие",
-          meta: fmt.minutes(next.duration_minutes),
-          notch: notchOf(dict.lessonStatus(next.status)),
-        }
-      : null,
+    total: today.length,
+    cancelledToday: all.length - today.length,
+    ribbon,
+    attention,
     stats: [
-      { label: "Ожидается оплата", value: fmt.money(s.expected_today_income ?? 0), notch: notchOf(dict.paymentStatus(dict.PAYMENT_STATUS.STUDENT_MARKED)) },
-      { label: "Домашки на проверку", value: String((admin.homeworks || []).filter((h) => h.status !== dict.HOMEWORK_STATUS.DONE && h.status !== dict.HOMEWORK_STATUS.CANCELLED).length), notch: notchOf(dict.homeworkStatus(dict.HOMEWORK_STATUS.WAITING)) },
-      Number(s.debt_amount || 0) > 0
-        ? { label: "Долги", value: fmt.money(s.debt_amount), notch: notchOf(dict.paymentStatus(dict.PAYMENT_STATUS.UNPAID)), tone: "debt" }
-        : { label: "Долги", value: fmt.money(0), notch: null },
-      { label: "Уроков за неделю", value: String(s.week_lessons || 0), notch: notchOf(dict.lessonStatus(dict.LESSON_STATUS.PLANNED)) },
+      { label: "Учеников", value: String(sum.students || 0) },
+      { label: "Уроков за неделю", value: String(sum.week_lessons || 0) },
+      { label: "Доход за месяц", value: fmt.money(sum.month_income || 0) },
+      Number(sum.debt_amount || 0) > 0
+        ? { label: "Долги", value: fmt.money(sum.debt_amount), tone: "debt" }
+        : { label: "Долги", value: fmt.money(0) },
     ],
-    todayLessons: adaptLessonDays(today, { withTotals: false })[0]?.items || [],
-    pending: (admin.pending_lessons || []).length,
   };
 }
 

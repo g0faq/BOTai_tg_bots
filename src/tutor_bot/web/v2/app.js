@@ -124,11 +124,8 @@ function tutorScreens(admin) {
         actions: {
           openCalendar: () => goTo("calendar"),
           openLesson: (id) => form("lesson", { lesson: findLesson(admin, id) }),
-          markConducted: () => { const n = admin.summary?.next_lesson; if (n) run("Занятие проведено", () => api.updateLesson(n.id, { status: dict.LESSON_STATUS.CONDUCTED })); },
           addLesson: () => form("lesson"),
-          addHomework: () => form("homework"),
-          addStudent: () => form("student"),
-          addPayment: () => form("payment"),
+          goTo,
         },
       })),
     }),

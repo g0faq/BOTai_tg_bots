@@ -1,6 +1,6 @@
 const rawTelegramWebApp = window.Telegram?.WebApp;
 const tg = rawTelegramWebApp?.initData ? rawTelegramWebApp : null;
-const APP_VERSION = "20260702-amvera-runtime-v70";
+const APP_VERSION = "20260806-schedule-cleanup-v71";
 const params = new URLSearchParams(window.location.search);
 const clientPathMatch = window.location.pathname.match(/^\/(client-\d+)(?:\/|$)/);
 const basePath = clientPathMatch ? `/${clientPathMatch[1]}` : "";
@@ -479,7 +479,7 @@ function updateProfileButton(payload) {
   profileButton.disabled = true;
   profileButton.title = "BOTай CRM";
   profileButton.setAttribute("aria-label", "BOTай CRM");
-  profileButton.innerHTML = '<img class="botai-logo-img" src="/assets/botai-logo.svg?v=20260702-amvera-runtime-v70" alt="" aria-hidden="true" />';
+  profileButton.innerHTML = '<img class="botai-logo-img" src="/assets/botai-logo.svg?v=20260806-schedule-cleanup-v71" alt="" aria-hidden="true" />';
 }
 
 function renderTabs(tabs) {
@@ -1248,6 +1248,16 @@ function renderStudentDetailShell(student) {
           <div class="section-head compact-head"><h3>Прогресс по заданиям ЕГЭ</h3><button class="mini-button" data-action="edit-progress" data-id="${student.id}" type="button">Подробнее</button></div>
           ${renderProgressChart({ topics }, student, false)}
         </article>
+
+        ${
+          state.payload.role === "tutor"
+            ? `<article class="premium-card student-actions-card">
+                 <div class="section-head compact-head"><h3>Стабильное расписание</h3></div>
+                 <p class="form-note">Удалит правила повторения и отправит будущие неоплаченные занятия в архив. Проведённые, прошедшие и оплаченные останутся на месте.</p>
+                 <button class="danger-button" type="button" data-action="cleanup-schedule" data-id="${student.id}" data-name="${escapeHtml(student.name)}">Очистить стабильное расписание</button>
+               </article>`
+            : ""
+        }
       </section>
     `;
   };
@@ -2690,6 +2700,49 @@ function renderTeacherProfile(profile = {}) {
   `;
 }
 
+function cleanupPreviewView(preview, studentId, studentName) {
+  const period =
+    preview.first_date && preview.last_date
+      ? `<p class="form-note">С ${formatDate(preview.first_date)} по ${formatDate(preview.last_date)}.</p>`
+      : "";
+  // Намеренно только form-note и кнопки: экранные классы вроде
+  // calendar-mode-summary внутри модалки схлопываются и числа становятся
+  // невидимыми, а подтверждение без чисел бессмысленно.
+  const skipped = (preview.skipped || [])
+    .map((item) => `<p class="form-note">Пропущено ${item.count} — ${escapeHtml(item.reason)}</p>`)
+    .join("");
+  const nothingToDo = !preview.cancel_count && !preview.rules;
+  return `
+    <section class="free-slots-view">
+      <p class="form-note">${escapeHtml(studentName)}</p>
+      <p class="form-note">Правил стабильного расписания: <strong>${preview.rules}</strong></p>
+      <p class="form-note">Будет отменено занятий: <strong>${preview.cancel_count}</strong></p>
+      <p class="form-note">Будет пропущено: <strong>${preview.skipped_total}</strong></p>
+      ${period}
+      ${skipped}
+      <p class="form-note">Занятия не удаляются — они переедут в архив календаря.</p>
+      ${
+        nothingToDo
+          ? `<p class="form-note">Очищать нечего.</p>`
+          : `<button class="danger-button" type="button" data-action="confirm-cleanup-schedule" data-id="${studentId}">Очистить: отменить ${preview.cancel_count}</button>`
+      }
+    </section>
+  `;
+}
+
+function cleanupResultView(result) {
+  const skipped = result.skipped_total
+    ? ` Пропущено ${result.skipped_total}: ${(result.skipped || []).map((item) => `${item.count} — ${item.reason}`).join(", ")}.`
+    : "";
+  return `
+    <section class="free-slots-view">
+      <p class="form-note">Отменено ${result.cancel_count} занятий, удалено правил: ${result.rules}.${escapeHtml(skipped)}</p>
+      <p class="form-note">Отменённые занятия доступны в календаре по кнопке «Архив».</p>
+      <button class="primary-button" type="button" data-action="close-modal">Понятно</button>
+    </section>
+  `;
+}
+
 function renderFab() {
   return `
     <div class="fab-wrap">
@@ -3515,6 +3568,9 @@ function attachHandlers() {
       state.editingStudent = false;
       state.activeView = "students";
       await load();
+    } else if (action === "cleanup-schedule") {
+      const preview = await api(`/api/admin/students/${id}/schedule-cleanup`);
+      openModal("Очистить стабильное расписание", cleanupPreviewView(preview, id, target.dataset.name || "Ученик"));
     } else if (action === "toggle-fab") {
       const menu = document.querySelector(".fab-menu");
       menu.toggleAttribute("hidden");
@@ -3773,6 +3829,12 @@ function attachHandlers() {
       const current = form?.querySelector('input[name="duration_minutes"]')?.value || "60";
       const value = prompt("Длительность в минутах", current);
       if (value !== null) syncDurationChoice(form, value);
+    } else if (target?.dataset.action === "confirm-cleanup-schedule") {
+      const studentId = Number(target.dataset.id || 0);
+      target.disabled = true;
+      const result = await api(`/api/admin/students/${studentId}/schedule-cleanup`, { method: "POST" });
+      openModal("Расписание очищено", cleanupResultView(result));
+      await load();
     } else if (target?.dataset.action === "close-modal") {
       closeModal({ animate: true });
     } else if (target?.dataset.action === "show-free-slots") {

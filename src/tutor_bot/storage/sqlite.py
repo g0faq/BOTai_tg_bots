@@ -920,6 +920,24 @@ class SQLiteStorage:
         lessons = [self._row_to_lesson(row) for row in rows]
         return [lesson for lesson in lessons if lesson.ends_at > starts_at]
 
+    def list_cancelled_lessons_between(
+        self,
+        starts_at: datetime,
+        ends_at: datetime,
+    ) -> list[Lesson]:
+        """Только отменённые занятия окна — для режима архива."""
+        rows = self.conn.execute(
+            "SELECT * FROM lessons WHERE starts_at < ? AND status IN (?, ?, ?) ORDER BY starts_at",
+            (
+                _dt(ends_at),
+                LessonStatus.CANCELLED_BY_STUDENT.value,
+                LessonStatus.CANCELLED_BY_TEACHER.value,
+                LessonStatus.CANCELLED_BY_PARENT.value,
+            ),
+        ).fetchall()
+        lessons = [self._row_to_lesson(row) for row in rows]
+        return [lesson for lesson in lessons if lesson.ends_at > starts_at]
+
     def list_student_lessons(self, student_id: int, limit: int = 20) -> list[Lesson]:
         rows = self.conn.execute(
             "SELECT * FROM lessons WHERE student_id = ? ORDER BY starts_at DESC LIMIT ?",
@@ -1516,6 +1534,18 @@ class SQLiteStorage:
                 (student_id,),
             ).fetchall()
         return [self._row_to_schedule_rule(row) for row in rows]
+
+    def delete_schedule_rules_for_student(self, student_id: int) -> int:
+        cursor = self.conn.execute("DELETE FROM schedule_rules WHERE student_id = ?", (student_id,))
+        self.conn.commit()
+        return cursor.rowcount
+
+    def list_lesson_ids_with_payments(self, student_id: int) -> set[int]:
+        rows = self.conn.execute(
+            "SELECT DISTINCT lesson_id FROM payments WHERE student_id = ? AND lesson_id IS NOT NULL",
+            (student_id,),
+        ).fetchall()
+        return {int(row["lesson_id"]) for row in rows}
 
     def list_debtors(self) -> list[StudentProfile]:
         rows = self.conn.execute(

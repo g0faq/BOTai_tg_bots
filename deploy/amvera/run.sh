@@ -26,6 +26,13 @@ if [[ -s "$G0_BOT_TOKEN_FILE" ]]; then
   G0_BOT_TOKEN="$(tr -d '\r\n' < "$G0_BOT_TOKEN_FILE")"
 fi
 
+# Хеш выкаченного коммита для GET /api/build. Если git или .git недоступны,
+# остаётся "unknown" — на запуск это не влияет.
+if [[ -z "${BUILD_COMMIT:-}" ]]; then
+  BUILD_COMMIT="$(git -C "$PROJECT_ROOT" rev-parse HEAD 2>/dev/null || echo unknown)"
+fi
+export BUILD_COMMIT
+
 export BOT_RUNTIME=server
 export BOT_TOKEN="$G0_BOT_TOKEN"
 export DATABASE_PATH="$G0_DATABASE_PATH"

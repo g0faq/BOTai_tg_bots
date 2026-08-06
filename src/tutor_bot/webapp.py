@@ -4,6 +4,7 @@ import hashlib
 import hmac
 import json
 import logging
+import os
 import secrets
 from contextlib import asynccontextmanager
 from dataclasses import asdict
@@ -44,6 +45,7 @@ from tutor_bot.main import build_work_hours
 from tutor_bot.services.homework import submit_homework
 from tutor_bot.services.payments import confirm_payment, reject_payment
 from tutor_bot.services.preparation import knowledge_status
+from tutor_bot.services.schedule_cleanup import apply_cleanup, plan_cleanup
 from tutor_bot.services.scheduling import (
     RecurringLessonSlot,
     SlotUnavailableError,
@@ -66,7 +68,7 @@ BROWSER_SESSION_COOKIE_PREFIX = "tutor_browser_session"
 ADVANCE_PAYMENT_MARKERS = {"advance", "auto"}
 ADVANCE_OVERRIDE_PREFIX = "[[botai_advance_override:"
 ADVANCE_OVERRIDE_SUFFIX = "]]"
-APP_VERSION = "20260702-amvera-runtime-v70"
+APP_VERSION = "20260806-schedule-cleanup-v71"
 
 
 class AppState:
@@ -1215,8 +1217,14 @@ def student_bundle(state: AppState, student_id: int) -> dict[str, Any]:
     current_lessons = [
         lesson for lesson in lessons_sorted if current_start <= lesson.starts_at <= current_end and not is_cancelled(lesson.status)
     ]
+    # Архив = прошедшие занятия любого статуса плюс отменённые из будущего
+    # окна: очистка стабильного расписания отменяет будущие занятия, и увидеть
+    # их можно только здесь.
     archive_lessons = [
-        lesson for lesson in lessons_sorted if archive_start <= lesson.starts_at <= archive_end and not is_cancelled(lesson.status)
+        lesson
+        for lesson in lessons_sorted
+        if (archive_start <= lesson.starts_at <= archive_end)
+        or (current_start <= lesson.starts_at <= current_end and is_cancelled(lesson.status))
     ]
     homeworks = state.db.list_homeworks(student.id, limit=60)
     payments = state.db.list_student_payments(student.id)[:60]
@@ -1282,7 +1290,11 @@ def admin_bundle(state: AppState) -> dict[str, Any]:
     archive_end = datetime.combine(today - timedelta(days=1), time.max)
     students = sync_all_student_advances(state, state.db.list_students())
     calendar_lessons = state.db.list_lessons_between(calendar_start, calendar_end, include_cancelled=False)
-    archive_lessons = state.db.list_lessons_between(archive_start, archive_end, include_cancelled=False)
+    archive_lessons = sorted(
+        state.db.list_lessons_between(archive_start, archive_end, include_cancelled=True)
+        + state.db.list_cancelled_lessons_between(calendar_start, calendar_end),
+        key=lambda item: item.starts_at,
+    )
     closed_slots = state.db.list_closed_slots_between(calendar_start, calendar_end)
     closed_slots_archive = state.db.list_closed_slots_between(archive_start, archive_end)
     month_lessons = state.db.list_lessons_between(month_start, month_end, include_cancelled=False)
@@ -1810,6 +1822,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def app_version() -> dict[str, str]:
         return {"version": APP_VERSION}
 
+    @app.get("/api/build")
+    def app_build() -> dict[str, str]:
+        # Отдельно от APP_VERSION: та константа продублирована в app.js и
+        # завязана на инвалидацию кеша фронта, а здесь нужен ровно тот коммит,
+        # который сейчас выкачен.
+        return {"commit": os.getenv("BUILD_COMMIT", "").strip() or "unknown"}
+
     @app.get("/healthz")
     def healthz() -> dict[str, str]:
         return {"status": "ok", "version": APP_VERSION}
@@ -1996,6 +2015,36 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def get_student_detail(student_id: int, account: UserAccount = current_account_dep) -> dict[str, Any]:
         require_admin(account)
         return student_bundle(state, student_id)
+
+    def _cleanup_target(student_id: int, account: UserAccount) -> StudentProfile:
+        """Явная проверка прав для очистки расписания.
+
+        Роль обязана быть tutor, и ученик обязан существовать в базе именно
+        этого репетитора: у каждого инстанса бота своя БД, поэтому наличие
+        карточки здесь и есть подтверждение владения. На то, что роут вызовут
+        только из кабинета, не полагаемся.
+        """
+        require_admin(account)
+        student = state.db.get_student(student_id)
+        if student is None:
+            raise HTTPException(status_code=404, detail="Ученик не найден")
+        return student
+
+    @app.get("/api/admin/students/{student_id}/schedule-cleanup")
+    def preview_schedule_cleanup(
+        student_id: int, account: UserAccount = current_account_dep
+    ) -> dict[str, Any]:
+        _cleanup_target(student_id, account)
+        plan = plan_cleanup(state.db, student_id, state.settings.local_now())
+        return plan.as_payload()
+
+    @app.post("/api/admin/students/{student_id}/schedule-cleanup")
+    def run_schedule_cleanup(
+        student_id: int, account: UserAccount = current_account_dep
+    ) -> dict[str, Any]:
+        _cleanup_target(student_id, account)
+        plan = apply_cleanup(state.db, student_id, state.settings.local_now())
+        return {**plan.as_payload(), "admin": admin_bundle(state)}
 
     @app.post("/api/admin/students/{student_id}/browser-invites")
     def create_browser_invite(

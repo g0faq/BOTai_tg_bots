@@ -5,6 +5,7 @@ import os
 from dataclasses import dataclass
 from datetime import date, datetime, time
 from pathlib import Path
+from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
 
 
@@ -96,6 +97,12 @@ class Settings:
         """
         override = os.getenv("TELEGRAM_MINIAPP_URL", "").strip()
         if override:
+            # Слеш в конце обязателен, если адрес указывает в подпапку.
+            # Без него запрос к «/v2» получает от Starlette редирект на
+            # «/v2/», а за прокси Amvera он собирается со схемой http —
+            # и Telegram отказывается открывать Mini App по не-HTTPS.
+            if urlparse(override).path.strip("/"):
+                return override if override.endswith("/") else override + "/"
             return override.rstrip("/")
         return self.webapp_url.rstrip("/")
 

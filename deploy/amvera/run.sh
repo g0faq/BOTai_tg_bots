@@ -88,9 +88,13 @@ if [[ "$RUN_TELEGRAM_BOTS" =~ ^(1|true|yes|on)$ ]]; then
   pids+=("$!")
 fi
 
+# --proxy-headers: за edge-прокси Amvera приложение иначе не знает, что
+# запрос пришёл по https, и строит редиректы со схемой http.
 uvicorn tutor_bot.amvera_app:app \
   --host 0.0.0.0 \
-  --port "$PORT" &
+  --port "$PORT" \
+  --proxy-headers \
+  --forwarded-allow-ips='*' &
 pids+=("$!")
 
 wait -n "${pids[@]}"

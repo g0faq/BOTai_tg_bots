@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
-from datetime import date, datetime, time, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
 from urllib.parse import urlencode
 
@@ -24,6 +24,11 @@ from tutor_bot.domain.models import (
     PrepTopic,
     StudentProfile,
     UserAccount,
+)
+from tutor_bot.services.heartbeat import (
+    STALE_AFTER_SECONDS,
+    heartbeat_path,
+    write_heartbeat,
 )
 from tutor_bot.storage.sqlite import SQLiteStorage
 from tutor_bot.webapp import create_app, verify_init_data
@@ -145,6 +150,40 @@ def test_healthz_endpoint_is_lightweight(tmp_path: Path) -> None:
     assert response.json()["status"] == "ok"
     assert response.headers["x-app-version"] == response.json()["version"]
     assert "clear-site-data" not in response.headers
+
+
+def test_healthz_reports_reminder_loop_state(tmp_path: Path) -> None:
+    settings = make_settings(tmp_path)
+    client = TestClient(create_app(settings))
+
+    unknown = client.get("/healthz").json()
+    assert unknown["reminder_status"] == "unknown"
+    assert unknown["reminder_last_run_ts"] is None
+    assert unknown["reminder_age_seconds"] is None
+
+    write_heartbeat(settings.database_path)
+    fresh = client.get("/healthz").json()
+
+    assert fresh["reminder_status"] == "ok"
+    assert fresh["reminder_last_run_ts"] is not None
+    assert fresh["reminder_age_seconds"] < 5
+
+
+def test_healthz_stays_200_when_reminder_loop_is_stale(tmp_path: Path) -> None:
+    settings = make_settings(tmp_path)
+    client = TestClient(create_app(settings))
+    stale_ts = datetime.now(UTC) - timedelta(seconds=STALE_AFTER_SECONDS + 60)
+    heartbeat_path(settings.database_path).write_text(
+        json.dumps({"ts": stale_ts.isoformat(), "last_error": "OperationalError: database is locked"}),
+        encoding="utf-8",
+    )
+
+    response = client.get("/healthz")
+
+    # 503 могло бы увести Amvera в цикл перезапусков прода — статус только в теле.
+    assert response.status_code == 200
+    assert response.json()["reminder_status"] == "stale"
+    assert response.json()["status"] == "ok"
 
 
 def test_student_dashboard_and_payment_flow(tmp_path: Path) -> None:

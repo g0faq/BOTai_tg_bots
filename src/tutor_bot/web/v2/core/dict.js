@@ -156,6 +156,12 @@ export const lessonStatusOptions = () =>
 export const paymentStatusOptions = () =>
   Object.keys(PAYMENT).map((value) => ({ value, ...PAYMENT[value] }));
 
+export const planStatusOptions = () =>
+  Object.keys(PLAN).map((value) => ({ value, ...PLAN[value] }));
+
+export const homeworkStatusOptions = () =>
+  Object.keys(HOMEWORK).map((value) => ({ value, ...HOMEWORK[value] }));
+
 /** Уровень знания 0–10 → тон полосы задания. Пороги из дизайна. */
 export function levelTone(level) {
   const n = Math.max(0, Math.min(10, Number(level) || 0));

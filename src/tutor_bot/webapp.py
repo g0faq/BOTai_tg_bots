@@ -61,6 +61,9 @@ from tutor_bot.services.timezones import convert_timezone, normalize_timezone, t
 from tutor_bot.storage.sqlite import SQLiteStorage
 
 STATIC_DIR = Path(__file__).resolve().parent / "web" / "static"
+# Новый фронт живёт параллельно старому и не пересекается с ним ни в одном
+# файле: APP_VERSION остаётся синхронной со старым app.js.
+STATIC_V2_DIR = Path(__file__).resolve().parent / "web" / "v2"
 ADMIN_ONLY = {Role.ADMIN.value}
 BROWSER_INVITE_DAYS = 3650
 BROWSER_SESSION_DAYS = 180
@@ -1790,6 +1793,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return response
 
     app.mount("/assets", StaticFiles(directory=STATIC_DIR), name="assets")
+    app.mount("/v2", StaticFiles(directory=STATIC_V2_DIR, html=True), name="v2")
 
     def current_account(
         request: Request,

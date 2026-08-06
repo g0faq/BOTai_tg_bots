@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>БОТай CRM · витрина компонентов</title>
+    <link rel="stylesheet" href="./styles/tokens.css" />
+    <link rel="stylesheet" href="./styles/base.css" />
+    <link rel="stylesheet" href="./styles/ui.css" />
+    <style>
+      /* Обвязка самой витрины. Продуктовые компоненты сюда не заглядывают. */
+      body { padding: var(--space-6) var(--space-4) var(--space-12); }
+
+      #root { max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: var(--space-12); }
+
+      .kit-head { display: flex; flex-direction: column; gap: var(--space-2); max-width: 68ch; }
+      .kit-head__eyebrow {
+        font-size: var(--fs-caps); letter-spacing: var(--tr-caps);
+        text-transform: uppercase; color: var(--text-3);
+      }
+      .kit-head__title { font-size: var(--fs-title); line-height: var(--lh-title); font-weight: var(--fw-semibold); letter-spacing: var(--tr-title); }
+      .kit-head__lead { font-size: var(--fs-meta); line-height: var(--lh-meta); color: var(--text-2); }
+      .kit-nav { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+      .kit-nav__link {
+        height: var(--chip); display: inline-flex; align-items: center; padding: 0 var(--space-3);
+        border: var(--hair) solid var(--border-strong); border-radius: var(--radius-1);
+        font-size: var(--fs-meta); color: var(--text-2);
+      }
+
+      .kit-section { display: flex; flex-direction: column; gap: var(--space-4); scroll-margin-top: var(--space-4); }
+      .kit-section__head { border-bottom: var(--hair) solid var(--border-strong); padding-bottom: var(--space-2); }
+      .kit-section__title {
+        font-size: var(--fs-caps); letter-spacing: var(--tr-caps);
+        text-transform: uppercase; font-weight: var(--fw-semibold);
+      }
+      .kit-section__note { margin-top: var(--space-1); font-size: var(--fs-cap); color: var(--text-3); max-width: 76ch; }
+
+      .kit-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: var(--space-6); align-items: start; }
+
+      .kit-demo { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
+      .kit-demo__label {
+        font-family: var(--font-mono); font-size: var(--fs-caps); letter-spacing: var(--tr-micro);
+        text-transform: uppercase; color: var(--text-3);
+      }
+      .kit-demo__stage { border: var(--hair) solid var(--border); background: var(--surface); padding: var(--space-3); }
+      .kit-demo__note { font-size: var(--fs-cap); line-height: var(--lh-cap); color: var(--text-3); }
+
+      .kit-list { border-top: var(--hair) solid var(--border-hair); background: var(--bg); }
+      .kit-col { display: flex; flex-direction: column; gap: var(--space-2); }
+      .kit-row-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-2); }
+      .kit-row-inline { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+
+      .kit-tokens { display: flex; flex-direction: column; }
+      .kit-token {
+        display: grid; grid-template-columns: 28px 150px 1fr; align-items: center; gap: var(--space-3);
+        height: 34px; border-bottom: var(--hair) solid var(--border-hair);
+      }
+      .kit-token__chip { width: 22px; height: 22px; border: var(--hair) solid var(--border-strong); }
+      .kit-token__notch { position: relative; display: block; width: 22px; height: 24px; background: var(--surface-2); }
+      .kit-token__name { font-size: var(--fs-cap); color: var(--text); }
+      .kit-token__use { font-size: var(--fs-cap); color: var(--text-3); }
+
+      .kit-types { display: flex; flex-direction: column; }
+      .kit-type {
+        display: grid; grid-template-columns: 110px 1fr 130px; align-items: baseline; gap: var(--space-3);
+        padding: var(--space-2) 0; border-bottom: var(--hair) solid var(--border-hair);
+      }
+      .kit-type__spec { font-size: var(--fs-cap); color: var(--text-2); }
+      .kit-type__role { font-size: var(--fs-cap); color: var(--text-3); }
+
+      .kit-band { display: flex; align-items: flex-end; gap: var(--space-2); }
+
+      .kit-tabbar-stage { position: relative; height: calc(var(--tabbar) + var(--space-2)); }
+      .kit-tabbar-stage .tabbar { position: absolute; border: var(--hair) solid var(--border); }
+      .kit-fab-stage { position: relative; height: 200px; background: var(--bg); border: var(--hair) solid var(--border-hair); }
+      .kit-fab-stage .fab { position: absolute; right: var(--space-4); bottom: var(--space-4); }
+
+      .kit-fmts { display: flex; flex-direction: column; }
+      .kit-fmt {
+        display: grid; grid-template-columns: 1fr auto; gap: var(--space-3); align-items: baseline;
+        padding: var(--space-1) 0; border-bottom: var(--hair) solid var(--border-hair);
+      }
+      .kit-fmt__call { font-size: var(--fs-cap); color: var(--text-3); }
+      .kit-fmt__result { font-size: var(--fs-meta); color: var(--text); }
+
+      @media (max-width: 720px) {
+        .kit-grid { grid-template-columns: 1fr; }
+        body { padding: var(--space-4) var(--space-3) var(--space-12); }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./kit.js"></script>
+  </body>
+</html>

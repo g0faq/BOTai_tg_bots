@@ -1,18 +1,20 @@
 /* График дохода за 7 дней и круговой индикатор прогресса. */
 import { el, num } from "./dom.js";
-import { money } from "../core/format.js";
+import { money, groupDigits } from "../core/format.js";
 
-export function IncomeChart({ days = [] } = {}) {
+export function IncomeChart({ days = [], showValues = false } = {}) {
   const max = Math.max(...days.map((d) => Number(d.value) || 0), 1);
   return el("figure", { class: "chart" }, [
     el("div", { class: "chart__plot" }, days.map((d) =>
       el("div", { class: "chart__col", title: `${d.label}: ${money(d.value)}` }, [
+        showValues ? el("span", { class: "num chart__value", text: groupDigits(d.value) }) : null,
         el("span", {
           class: "chart__bar",
           style: { height: `${Math.max(6, (Number(d.value) || 0) / max * 100)}%` },
         }),
-        el("span", { class: "num chart__label", text: d.label }),
       ]))),
+    el("div", { class: "chart__axis" }, days.map((d) =>
+      el("span", { class: "num chart__label", text: d.label }))),
   ]);
 }
 

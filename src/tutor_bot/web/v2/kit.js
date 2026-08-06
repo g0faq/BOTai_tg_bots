@@ -395,7 +395,8 @@ function boot() {
       el("nav", { class: "kit-nav" }, [
         ["tokens", "Токены"], ["buttons", "Кнопки"], ["fields", "Поля"], ["filters", "Фильтры"],
         ["rows", "Строки"], ["students", "Ученики"], ["charts", "Графики"], ["shell", "Каркас"], ["format", "Форматы"],
-      ].map(([id, label]) => el("a", { class: "kit-nav__link", href: `#${id}`, text: label }))),
+      ].map(([id, label]) => el("a", { class: "kit-nav__link", href: `#${id}`, text: label }))
+        .concat([el("a", { class: "kit-nav__link", href: "./screens.html", text: "Экраны · проход 2 →" })])),
     ]),
     tokensSection(),
     buttonsSection(),

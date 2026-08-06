@@ -51,7 +51,13 @@ const view = {
   calendarArchive: false,
   operationFilter: "",
   cardTab: "profile",
+  screen: "overview",
 };
+
+/* Какую вкладку подсвечивать для экрана. Карточка ученика — часть раздела
+ * «Ученики», профиль вкладкой не представлен. */
+const TAB_FOR_SCREEN = { "student-card": "students", profile: null };
+const tabForScreen = (id) => (id in TAB_FOR_SCREEN ? TAB_FOR_SCREEN[id] : id);
 
 const tg = () => globalThis.Telegram?.WebApp;
 
@@ -75,6 +81,14 @@ async function run(label, fn) {
 
 let router = null;
 let shell = null;
+let paintTabs = () => {};
+
+/** Единственная точка перехода: меняет экран и сразу обновляет подсветку. */
+function goTo(id) {
+  view.screen = id;
+  router.go(id);
+  paintTabs();
+}
 
 /** Контекст, который нужен формам: список учеников и выбранный ученик. */
 function formCtx() {
@@ -108,7 +122,7 @@ function tutorScreens(admin) {
       mount: (c) => c.append(OverviewScreen({
         model: adapt.adaptOverview(admin),
         actions: {
-          openCalendar: () => router.go("calendar"),
+          openCalendar: () => goTo("calendar"),
           openLesson: (id) => form("lesson", { lesson: findLesson(admin, id) }),
           markConducted: () => { const n = admin.summary?.next_lesson; if (n) run("Занятие проведено", () => api.updateLesson(n.id, { status: dict.LESSON_STATUS.CONDUCTED })); },
           addLesson: () => form("lesson"),
@@ -134,7 +148,7 @@ function tutorScreens(admin) {
             setQuery: (v) => { view.studentFilters.query = v; render(); },
             setPrep: (v) => { view.studentFilters.prep = v; render(); },
             setSort: (v) => { view.studentFilters.sort = v; render(); },
-            openStudent: (id) => { setState({ selectedStudentId: id }); router.go("student-card"); },
+            openStudent: (id) => { setState({ selectedStudentId: id }); goTo("student-card"); },
             createStudent: () => form("student"),
           },
         }));
@@ -144,12 +158,17 @@ function tutorScreens(admin) {
     "student-card": () => ({
       mount(c) {
         const model = adapt.adaptStudentCard(admin, getState().selectedStudentId);
-        if (!model) return router.go("students");
+        if (!model) return goTo("students");
         c.append(StudentCardScreen({
           model, tab: view.cardTab,
           actions: {
             setTab: (v) => { view.cardTab = v; render(); },
-            back: () => router.go("students"),
+            back: () => goTo("students"),
+            openLesson: (id) => form("lesson", { lesson: findLesson(admin, id) }),
+            openNextLesson: () => {
+              const next = (admin.calendar || []).find((l) => Number(l.student_id) === Number(getState().selectedStudentId));
+              if (next) form("lesson", { lesson: next });
+            },
             edit: () => form("student", { student: (admin.students || []).find((x) => Number(x.id) === Number(getState().selectedStudentId)) }),
             invite: () => form("browserInvite", { studentId: model.student.id }),
             openProgress: () => form("progress", { studentId: model.student.id, topics: topicsFor(admin, model.student.id) }),
@@ -177,6 +196,7 @@ function tutorScreens(admin) {
         actions: {
           setMode: (v) => { view.calendarMode = v; render(); },
           toggleArchive: () => { view.calendarArchive = !view.calendarArchive; render(); },
+          openLesson: (id) => form("lesson", { lesson: findLesson(admin, id) }),
           markConducted: (id) => run("Занятие проведено", () => api.updateLesson(id, { status: "проведено" })),
           confirmPayment: (id) => run("Оплата подтверждена", () => api.confirmLesson(id)),
           deleteClosedSlot: (id) => run("Окно открыто", () => api.deleteClosedSlot(id)),
@@ -225,7 +245,7 @@ function tutorScreens(admin) {
         prepTypes: admin.profile?.prep_types || [],
         workingDays: admin.profile?.working_days || [1, 2, 3, 4, 5, 6, 7],
         actions: {
-          back: () => router.go("overview"),
+          back: () => goTo("overview"),
           invite: () => form("browserInvite", {}),
           save: () => run("Профиль сохранён", () => api.updateTutorProfile({ ...(admin.profile || {}) })),
         },
@@ -326,7 +346,7 @@ function render() {
   }
 
   const screens = isTutor ? tutorScreens(payload.admin || {}) : clientScreens(payload);
-  const active = router?.active && screens[router.active] ? router.active : "overview";
+  const active = screens[view.screen] ? view.screen : "overview";
 
   if (!router || router.registered.join() !== Object.keys(screens).join()) {
     router = createRouter({ container: shell.body });
@@ -340,15 +360,15 @@ function render() {
       ? `${(payload.admin?.summary?.students) || 0} уч. · ${(payload.admin?.summary?.week_lessons) || 0} уроков`
       : payload.role === "parent" ? "Кабинет родителя" : "Кабинет ученика",
     actions: [
-      IconButton({ glyph: "◍", label: "Профиль", onClick: () => router.go("profile") }),
+      IconButton({ glyph: "◍", label: "Профиль", onClick: () => goTo("profile") }),
       IconButton({ glyph: "↻", label: "Обновить", onClick: () => reload().catch(() => toast("Не удалось обновить", "debt")) }),
     ],
   }));
 
-  shell.tabbar.replaceChildren(TabBar({
+  paintTabs = () => shell.tabbar.replaceChildren(TabBar({
     items: tabs,
-    value: tabs.some((t) => t.value === router.active) ? router.active : active,
-    onSelect: (v) => router.go(v),
+    value: tabForScreen(view.screen),
+    onSelect: goTo,
   }));
 
   // Fab возвращает null для роли без действий — replaceChildren(null)
@@ -366,7 +386,9 @@ function render() {
     : null;
   if (fab) shell.fab.append(fab);
 
+  view.screen = active;
   router.go(active);
+  paintTabs();
 }
 
 /* --- запуск --------------------------------------------------------------- */

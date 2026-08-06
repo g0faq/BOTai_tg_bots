@@ -35,20 +35,24 @@ export BUILD_COMMIT
 
 # Какой мини-апп открывает кнопка в боте. По умолчанию новый интерфейс.
 # Чтобы вернуть старый — задать WEBAPP_UI=legacy в переменных Amvera и
-# перезапустить. Код при этом не меняется, поэтому откат занимает минуту и
-# не требует выката. Старый фронт никуда не делся и лежит по адресу «/».
+# перезапустить. Код при этом не меняется, откат не требует выката.
+#
+# WEBAPP_URL остаётся корневым всегда: от него считаются ссылки входа
+# `/login/...`, путь cookie и адрес возврата после логина. Переключается
+# только TELEGRAM_MINIAPP_URL — адрес кнопки в Telegram.
 WEBAPP_UI="${WEBAPP_UI:-v2}"
 if [[ "$WEBAPP_UI" == "legacy" ]]; then
-  G0_WEBAPP_URL="$TELEGRAM_WEBAPP_BASE_URL/"
+  G0_MINIAPP_URL="$TELEGRAM_WEBAPP_BASE_URL/"
 else
-  G0_WEBAPP_URL="$TELEGRAM_WEBAPP_BASE_URL/v2/"
+  G0_MINIAPP_URL="$TELEGRAM_WEBAPP_BASE_URL/v2/"
 fi
 
 export BOT_RUNTIME=server
 export BOT_TOKEN="$G0_BOT_TOKEN"
 export DATABASE_PATH="$G0_DATABASE_PATH"
 export TELEGRAM_WEBAPP_BASE_URL
-export WEBAPP_URL="$G0_WEBAPP_URL"
+export WEBAPP_URL="$TELEGRAM_WEBAPP_BASE_URL/"
+export TELEGRAM_MINIAPP_URL="$G0_MINIAPP_URL"
 export WEBAPP_HOST=0.0.0.0
 export WEBAPP_PORT="$PORT"
 
@@ -67,7 +71,8 @@ if [[ "$RUN_TELEGRAM_BOTS" =~ ^(1|true|yes|on)$ ]]; then
   env \
     BOT_TOKEN="$G0_BOT_TOKEN" \
     DATABASE_PATH="$G0_DATABASE_PATH" \
-    WEBAPP_URL="$G0_WEBAPP_URL" \
+    WEBAPP_URL="$TELEGRAM_WEBAPP_BASE_URL/" \
+    TELEGRAM_MINIAPP_URL="$G0_MINIAPP_URL" \
     python -m tutor_bot.main &
   pids+=("$!")
 

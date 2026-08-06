@@ -300,6 +300,22 @@
   border-bottom: var(--hair) solid var(--border-hair);
 }
 .lesson:has(.lesson__actions) { grid-template-columns: 52px minmax(0, 1fr) auto auto; }
+.lesson__actions { display: flex; gap: var(--space-1); }
+/* Компактные кнопки: полноразмерные 44 px отнимали у имени столько ширины,
+   что «Михаил Волосов» превращался в «Михаи...». Высота строки при этом
+   остаётся 64 px по токену, вертикаль не растёт. */
+.lesson__actions .icon-btn { width: 36px; height: 36px; }
+
+/* На узком экране цена уступает место имени: сумма за день есть в
+   заголовке дня, а статус оплаты — в пилюле. */
+@media (max-width: 420px) {
+  .lesson__price { display: none; }
+  .lesson__actions .icon-btn { width: 34px; }
+  /* Остаётся только глиф: он дублирует цвет по правилам системы, а полная
+     подпись доступна в title и при открытии занятия. Имя ученика важнее. */
+  .lesson__tail .pill__label { display: none; }
+  .lesson__tail .pill { padding: 0 var(--space-1); }
+}
 .lesson--dense { min-height: var(--row-lesson-dense); padding-block: var(--space-1); }
 .lesson__time { font-size: var(--fs-body); color: var(--text); }
 .lesson__main {
@@ -329,7 +345,6 @@
 }
 .lesson__tail { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
 .lesson__price { font-size: var(--fs-meta); color: var(--text-2); }
-.lesson__actions { display: flex; gap: var(--space-1); }
 
 /* Строка операции */
 .op {
@@ -1333,3 +1348,23 @@
   padding: 9px 10px;
 }
 .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
+
+/* Панель действий календаря: горизонтальная лента с прокруткой.
+   Внутри .screen__pad раскладка колоночная — пять кнопок по 44 px давали
+   почти 300 px по вертикали. */
+.calendar-rail {
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: var(--space-1);
+}
+.calendar-rail::-webkit-scrollbar { display: none; }
+.calendar-rail .btn {
+  flex: 0 0 auto;
+  height: var(--chip);
+  min-height: var(--chip);
+  padding: 0 var(--space-3);
+  font-size: var(--fs-meta);
+}

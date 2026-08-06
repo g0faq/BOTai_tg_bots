@@ -82,6 +82,17 @@ class Settings:
 
     @property
     def telegram_webapp_url(self) -> str:
+        """Адрес, который открывает кнопка Mini App в Telegram.
+
+        Отделён от WEBAPP_URL намеренно: от WEBAPP_URL считаются ссылки
+        входа `/login/...`, путь cookie и адрес возврата после логина. Если
+        подменить его на `/v2/`, ссылки доступа начинают указывать на
+        `/v2/login/...`, где роута нет. Поэтому интерфейс переключается
+        отдельной переменной, а серверная логика остаётся нетронутой.
+        """
+        override = os.getenv("TELEGRAM_MINIAPP_URL", "").strip()
+        if override:
+            return override.rstrip("/")
         return self.webapp_url.rstrip("/")
 
     @property

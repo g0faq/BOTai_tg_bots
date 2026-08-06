@@ -32,4 +32,11 @@ pythonpath = ["src"]
 testpaths = ["tests"]
 
 [tool.setuptools.package-data]
-tutor_bot = ["web/static/*"]
+tutor_bot = [
+    "web/static/*",
+    "web/v2/*",
+    "web/v2/core/*",
+    "web/v2/ui/*",
+    "web/v2/styles/*",
+    "web/v2/fonts/*",
+]

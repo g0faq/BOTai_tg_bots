@@ -1793,7 +1793,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return response
 
     app.mount("/assets", StaticFiles(directory=STATIC_DIR), name="assets")
-    app.mount("/v2", StaticFiles(directory=STATIC_V2_DIR, html=True), name="v2")
+    # Монтируем только если каталог на месте: StaticFiles на отсутствующей
+    # директории падает на старте и унёс бы оба мини-аппа разом.
+    if STATIC_V2_DIR.is_dir():
+        app.mount("/v2", StaticFiles(directory=STATIC_V2_DIR, html=True), name="v2")
+    else:
+        logging.warning("v2 static directory is missing, /v2 is not mounted: %s", STATIC_V2_DIR)
 
     def current_account(
         request: Request,

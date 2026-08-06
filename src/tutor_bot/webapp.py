@@ -43,6 +43,7 @@ from tutor_bot.domain.models import (
 )
 from tutor_bot.main import build_work_hours
 from tutor_bot.services.homework import submit_homework
+from tutor_bot.services.homework_lifecycle import split_homeworks
 from tutor_bot.services.payments import confirm_payment, reject_payment
 from tutor_bot.services.preparation import knowledge_status
 from tutor_bot.services.schedule_cleanup import apply_cleanup, plan_cleanup
@@ -1237,7 +1238,13 @@ def student_bundle(state: AppState, student_id: int) -> dict[str, Any]:
         if (archive_start <= lesson.starts_at <= archive_end)
         or (current_start <= lesson.starts_at <= current_end and is_cancelled(lesson.status))
     ]
-    homeworks = state.db.list_homeworks(student.id, limit=60)
+    homework_split = split_homeworks(
+        state.db.list_homeworks(student.id, limit=120),
+        state.db.homework_submission_dates(),
+        state.settings.local_now(),
+    )
+    homeworks = homework_split.current
+    homeworks_archive = homework_split.archived
     payments = state.db.list_student_payments(student.id)[:60]
     topics = state.db.list_prep_topics(student.id)
     rules = state.db.list_schedule_rules(student.id)
@@ -1268,6 +1275,7 @@ def student_bundle(state: AppState, student_id: int) -> dict[str, Any]:
         "lessons": [serialize_lesson(lesson, student, state.settings.timezone) for lesson in current_lessons],
         "lesson_archive": [serialize_lesson(lesson, student, state.settings.timezone) for lesson in archive_lessons],
         "homeworks": [serialize_homework(homework, student) for homework in homeworks],
+        "homeworks_archive": [serialize_homework(homework, student) for homework in homeworks_archive],
         "payments": [serialize_payment(payment, student) for payment in payments],
         "finances": {
             "payments": student_payment_history(state, student, lessons, payments),
@@ -1310,7 +1318,13 @@ def admin_bundle(state: AppState) -> dict[str, Any]:
     closed_slots_archive = state.db.list_closed_slots_between(archive_start, archive_end)
     month_lessons = state.db.list_lessons_between(month_start, month_end, include_cancelled=False)
     week_lessons = state.db.list_lessons_between(week_start, week_end, include_cancelled=False)
-    homeworks = state.db.list_homeworks(limit=120)
+    # Сданные домашки со следующего дня уходят в архив: в рабочем списке их
+    # нет, но до удаления через 10 дней они доступны отдельным ключом.
+    homework_split = split_homeworks(
+        state.db.list_homeworks(limit=200), state.db.homework_submission_dates(), now
+    )
+    homeworks = homework_split.current
+    homeworks_archive = homework_split.archived
     payments = state.db.list_pending_payments()
     all_payments = state.db.list_all_payments()
     confirmed_month_payments = [
@@ -1526,6 +1540,10 @@ def admin_bundle(state: AppState) -> dict[str, Any]:
         "homeworks": [
             serialize_homework(homework, student_by_id.get(homework.student_id))
             for homework in homeworks
+        ],
+        "homeworks_archive": [
+            serialize_homework(homework, student_by_id.get(homework.student_id))
+            for homework in homeworks_archive
         ],
         "finances": {
             "month_income": month_income,

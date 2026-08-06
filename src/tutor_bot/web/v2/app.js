@@ -213,10 +213,14 @@ function tutorScreens(admin) {
 
     homeworks: () => ({
       mount(c) {
-        const rows = adapt.adaptHomeworks(admin.homeworks || []);
+        const archive = view.homeworkFilter === "archive";
+        const rows = adapt.adaptHomeworks(
+          (archive ? admin.homeworks_archive : admin.homeworks) || [],
+        );
         c.append(HomeworksScreen({
           items: adapt.filterHomeworks(rows, view.homeworkFilter),
           total: rows.length,
+          archiveNote: archive,
           filter: view.homeworkFilter,
           canCreate: true,
           actions: {
@@ -274,8 +278,12 @@ function clientScreens(payload) {
     homeworks: () => ({
       mount(c) {
         c.append(HomeworksScreen({
-          items: adapt.filterHomeworks(m.homeworks, view.homeworkFilter),
-          total: m.homeworks.length,
+          items: adapt.filterHomeworks(
+            view.homeworkFilter === "archive" ? m.homeworksArchive : m.homeworks,
+            view.homeworkFilter,
+          ),
+          total: (view.homeworkFilter === "archive" ? m.homeworksArchive : m.homeworks).length,
+          archiveNote: view.homeworkFilter === "archive",
           filter: view.homeworkFilter,
           canCreate: false,
           actions: {

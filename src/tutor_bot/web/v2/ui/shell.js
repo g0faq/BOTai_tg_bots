@@ -5,6 +5,7 @@
  */
 import { el } from "./dom.js";
 import { IconButton } from "./button.js";
+import { tabIcon } from "./icons.js";
 
 export function Header({ title = "", subtitle = "", actions = [] } = {}) {
   return el("header", { class: "header" }, [
@@ -22,7 +23,14 @@ export function Header({ title = "", subtitle = "", actions = [] } = {}) {
 
 export const HeaderIcon = IconButton;
 
-/** Активная вкладка помечена засечкой сверху и «бумажным» текстом. */
+/**
+ * Активная вкладка помечена засечкой сверху и акцентным цветом иконки.
+ *
+ * Подписи заменены иконками одинакового размера: у текстовых подписей
+ * ширина разная («Ученики» против «ДЗ»), и при равных колонках зазоры между
+ * словами читались как неровные. Иконка 20×20 даёт одинаковый ритм.
+ * Название остаётся в aria-label и подсказке — смысл не теряется.
+ */
 export function TabBar({ items = [], value, onSelect } = {}) {
   return el("nav", { class: "tabbar", "aria-label": "Разделы" },
     items.map((item) => {
@@ -31,10 +39,12 @@ export function TabBar({ items = [], value, onSelect } = {}) {
         type: "button",
         class: `tabbar__item${active ? " is-active" : ""}`,
         "aria-current": active ? "page" : null,
+        "aria-label": item.label,
+        title: item.label,
         onClick: onSelect ? () => onSelect(item.value) : null,
       }, [
         el("span", { class: "tabbar__mark", "aria-hidden": "true" }),
-        el("span", { class: "tabbar__label", text: item.label }),
+        el("span", { class: "tabbar__icon" }, [tabIcon(item.value)]),
       ]);
     }));
 }

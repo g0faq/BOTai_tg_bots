@@ -156,6 +156,9 @@ export function adaptHomeworks(list = [], { withStudent = true } = {}) {
 }
 
 export function filterHomeworks(rows, filter) {
+  // Архив приходит с сервера отдельным списком, поэтому здесь его не
+  // фильтруем — экран подставляет нужный источник.
+  if (filter === "archive") return rows;
   if (filter === "work") return rows.filter((r) => r._raw.status === dict.HOMEWORK_STATUS.WAITING || r._raw.status === dict.HOMEWORK_STATUS.ASSIGNED);
   if (filter === "done") return rows.filter((r) => r._raw.status === dict.HOMEWORK_STATUS.DONE);
   if (filter === "overdue") return rows.filter((r) => isOverdue(r._raw));
@@ -418,6 +421,7 @@ export function adaptClient(payload) {
       { value: String((f.unpaid_lessons || []).length), label: "Ждут", tone: (f.unpaid_lessons || []).length ? "debt" : "none" },
     ],
     homeworks: adaptHomeworks(b.homeworks || [], { withStudent: false }),
+    homeworksArchive: adaptHomeworks(b.homeworks_archive || [], { withStudent: false }),
     taskNotes: (b.topics || [])
       .filter((t) => String(t.comment || "").trim())
       .map((t) => {

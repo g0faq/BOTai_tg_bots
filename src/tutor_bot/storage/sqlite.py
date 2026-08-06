@@ -1291,6 +1291,22 @@ class SQLiteStorage:
         submission.created_at = created_at
         return submission
 
+    def homework_submission_dates(self) -> dict[int, datetime]:
+        """Дата последней сдачи по каждой домашке.
+
+        Одним запросом, а не по домашке за раз: жизненный цикл считается
+        для всего списка сразу и в фоновом цикле, и при выдаче.
+        """
+        rows = self.conn.execute(
+            "SELECT homework_id, MAX(created_at) AS ts FROM homework_submissions GROUP BY homework_id"
+        ).fetchall()
+        out: dict[int, datetime] = {}
+        for row in rows:
+            parsed = _parse_dt(row["ts"])
+            if parsed is not None:
+                out[int(row["homework_id"])] = parsed
+        return out
+
     def upsert_prep_topic(self, topic: PrepTopic) -> PrepTopic:
         if topic.id is None:
             cur = self.conn.execute(

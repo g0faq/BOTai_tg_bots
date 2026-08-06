@@ -5,7 +5,7 @@
  * уходит то, что пришло оттуда.
  */
 
-import { el } from "../ui/dom.js";
+import { el, append } from "../ui/dom.js";
 import { ScreenHead } from "../ui/section.js";
 import { Button, IconButton } from "../ui/button.js";
 import { Segmented } from "../ui/chip.js";
@@ -17,6 +17,7 @@ export const HOMEWORK_FILTERS = [
   { value: "work", label: "В работе" },
   { value: "done", label: "Выполнены" },
   { value: "overdue", label: "Просрочены" },
+  { value: "archive", label: "Архив" },
 ];
 
 export function HomeworksScreen({
@@ -24,6 +25,7 @@ export function HomeworksScreen({
   total = items.length,
   filter = "all",
   canCreate = false,
+  archiveNote = false,
   actions = {},
 } = {}) {
   const root = el("section", { class: "screen screen--homeworks" });
@@ -41,11 +43,13 @@ export function HomeworksScreen({
         onClick: actions.openHomework ? () => actions.openHomework(h.id) : null,
       })))
     : EmptyState({
-        title: "Здесь пусто",
-        description: "Создайте домашку — ученик увидит её сразу и сможет прислать решение.",
+        title: archiveNote ? "Архив пуст" : "Здесь пусто",
+        description: archiveNote
+          ? "Сюда домашки попадают на следующий день после сдачи и хранятся 10 дней."
+          : "Создайте домашку — ученик увидит её сразу и сможет прислать решение.",
       });
 
-  root.append(
+  append(root, [
     ScreenHead({
       title: "Домашние задания",
       count: `${items.length}/${total}`,
@@ -53,6 +57,9 @@ export function HomeworksScreen({
         ? Button({ kind: "main", label: "Создать домашку", full: true, onClick: actions.createHomework })
         : null,
     }),
+    archiveNote
+      ? el("p", { class: "screen__note", text: "Домашки попадают в архив на следующий день после сдачи и удаляются через 10 дней." })
+      : null,
     el("div", { class: "screen__seg" }, [
       Segmented({
         items: HOMEWORK_FILTERS,
@@ -62,7 +69,7 @@ export function HomeworksScreen({
       }),
     ]),
     list,
-  );
+  ]);
 
   return root;
 }

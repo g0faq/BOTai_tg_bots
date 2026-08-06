@@ -15,6 +15,7 @@ from tutor_bot.bot.handlers import router
 from tutor_bot.config import Settings, load_dotenv, load_settings
 from tutor_bot.domain.enums import BalanceMode, LessonPaymentStatus, LessonStatus, PlanItemStatus
 from tutor_bot.services.google_sheets import GoogleSheetsReporter
+from tutor_bot.services.homework_lifecycle import purge_expired
 from tutor_bot.services.payments import mark_lesson_conducted
 from tutor_bot.services.scheduling import WorkHours
 from tutor_bot.storage.sqlite import SQLiteStorage
@@ -53,6 +54,9 @@ async def reminder_loop(bot: Bot, db: SQLiteStorage, settings: Settings) -> None
 async def run_reminder_iteration(bot: Bot, db: SQLiteStorage, settings: Settings) -> None:
     now = settings.local_now()
     await auto_complete_lessons(bot, db, settings, now)
+    removed = purge_expired(db, now)
+    if removed:
+        logging.info("Purged %s homeworks older than 10 days since submission: %s", len(removed), removed)
     window_start = now + timedelta(minutes=settings.reminder_minutes_before_lesson)
     window_end = window_start + timedelta(seconds=70)
     lessons = db.list_lessons_between(window_start, window_end, include_cancelled=False)

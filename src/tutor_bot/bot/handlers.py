@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import logging
 import secrets
 from collections import deque
 from collections.abc import Awaitable, Callable
@@ -91,6 +92,7 @@ from tutor_bot.services.calendar import build_lesson_ics, calendar_filename
 from tutor_bot.services.google_sheets import GoogleSheetsReporter
 from tutor_bot.services.homework import assign_homework, submit_homework
 from tutor_bot.services.payments import confirm_payment, mark_lesson_conducted, reject_payment
+from tutor_bot.services.personal_link import ensure_personal_invite, personal_link_url
 from tutor_bot.services.preparation import (
     EGE_INFORMATICS_TOPICS,
     exam_task_titles,
@@ -449,6 +451,28 @@ def hash_browser_token(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
 
 
+def personal_webapp_url(db: SQLiteStorage, settings: Settings, telegram_id: int) -> str:
+    """Адрес кнопки «Кабинет» для конкретного чата.
+
+    Если у чата есть привязанный профиль, отдаём персональную постоянную
+    ссылку: кабинет открывается уже авторизованным, даже когда Telegram не
+    передал initData. Иначе — обычный адрес мини-аппа.
+    """
+    base = settings.telegram_webapp_url
+    if not base:
+        return ""
+    try:
+        account = db.get_user(telegram_id)
+        if account and account.student_id and account.role in {Role.STUDENT.value, Role.PARENT.value}:
+            token = ensure_personal_invite(
+                db, settings, account.role, int(account.student_id), settings.local_now()
+            )
+            return personal_link_url(settings, token)
+    except Exception:
+        logging.exception("Failed to build personal cabinet link for %s", telegram_id)
+    return base
+
+
 def webapp_url_bases(settings: Settings) -> list[str]:
     bases = [settings.webapp_url, *(settings.webapp_url_aliases or [])]
     return list(dict.fromkeys(base.rstrip("/") for base in bases if base))
@@ -695,11 +719,11 @@ async def start(message: Message, state: FSMContext, db: SQLiteStorage, settings
         ]
         if settings.teacher_chat_link:
             lines.append(f"Чат с преподавателем: {settings.teacher_chat_link}")
-        await message.answer("\n".join(lines), reply_markup=student_menu(settings.telegram_webapp_url))
+        await message.answer("\n".join(lines), reply_markup=student_menu(personal_webapp_url(db, settings, message.from_user.id)))
         return
     await message.answer(
         "Привет! Основной кабинет теперь в Mini App: расписание, домашка, оплата и запись находятся там.\nНажми «Открыть Mini App» ниже. Анкету в чате оставил только как запасной вариант.",
-        reply_markup=first_start_menu(settings.telegram_webapp_url),
+        reply_markup=first_start_menu(personal_webapp_url(db, settings, message.from_user.id)),
     )
 
 
@@ -710,7 +734,7 @@ async def open_mini_app(message: Message, db: SQLiteStorage, settings: Settings)
     if not settings.telegram_webapp_url:
         await message.answer("Mini App URL не настроен.")
         return
-    reply_markup = admin_menu(settings.telegram_webapp_url) if is_admin(message, settings) else student_menu(settings.telegram_webapp_url)
+    reply_markup = admin_menu(settings.telegram_webapp_url) if is_admin(message, settings) else student_menu(personal_webapp_url(db, settings, message.from_user.id))
     urls = webapp_url_bases(settings) or [settings.telegram_webapp_url]
     await message.answer(
         "Открой Mini App кнопкой ниже.\n"
@@ -767,7 +791,7 @@ async def open_browser_version(message: Message, db: SQLiteStorage, settings: Se
     if account is None:
         await message.answer(
             "Я пока не нашел твою карточку. Сначала открой Mini App или заполни анкету.",
-            reply_markup=first_start_menu(settings.telegram_webapp_url),
+            reply_markup=first_start_menu(personal_webapp_url(db, settings, message.from_user.id)),
         )
         return
 
@@ -1104,6 +1128,8 @@ async def try_link_parent_to_existing_student(
         lines.append(f"Чат с преподавателем: {settings.teacher_chat_link}")
     await message.answer(
         "\n".join(lines),
+        # Рассылка нескольким адресатам: персональная ссылка у каждого своя,
+        # поэтому здесь остаётся общий адрес мини-аппа.
         reply_markup=student_menu(settings.telegram_webapp_url),
     )
     await notify_admins(bot, settings, f"Родитель привязан к ученику:\n{student_line(student)}")
@@ -1209,6 +1235,8 @@ async def finish_questionnaire(
         lines.append(f"Чат с преподавателем: {settings.teacher_chat_link}")
     await message.answer(
         "\n".join(lines),
+        # Рассылка нескольким адресатам: персональная ссылка у каждого своя,
+        # поэтому здесь остаётся общий адрес мини-аппа.
         reply_markup=student_menu(settings.telegram_webapp_url),
     )
     await notify_admins(
@@ -3124,6 +3152,8 @@ async def suggest_lesson_request_move_button(
                 "Выбери новое время через Mini App или кнопку «Записаться» в боте.",
             ]
         ),
+        # Рассылка нескольким адресатам: персональная ссылка у каждого своя,
+        # поэтому здесь остаётся общий адрес мини-аппа.
         reply_markup=student_menu(settings.telegram_webapp_url),
     )
 
@@ -3382,7 +3412,7 @@ async def my_cabinet(message: Message, db: SQLiteStorage, settings: Settings) ->
         return
     student = db.get_student(account.student_id)
     if student is None:
-        await message.answer("Карточка не найдена. Открой Mini App или заполни анкету заново.", reply_markup=first_start_menu(settings.telegram_webapp_url))
+        await message.answer("Карточка не найдена. Открой Mini App или заполни анкету заново.", reply_markup=first_start_menu(personal_webapp_url(db, settings, message.from_user.id)))
         return
     lessons = db.list_student_lessons(student.id, limit=20)
     now = settings.local_now()
@@ -3408,7 +3438,7 @@ async def my_cabinet(message: Message, db: SQLiteStorage, settings: Settings) ->
         lines.append(f"Чат с преподавателем: {settings.teacher_chat_link}")
     await message.answer(
         "\n".join(lines),
-        reply_markup=lesson_calendar_keyboard(next_lesson.id) if next_lesson else student_menu(settings.telegram_webapp_url),
+        reply_markup=lesson_calendar_keyboard(next_lesson.id) if next_lesson else student_menu(personal_webapp_url(db, settings, message.from_user.id)),
     )
 
 
@@ -3416,11 +3446,11 @@ async def my_cabinet(message: Message, db: SQLiteStorage, settings: Settings) ->
 async def my_card(message: Message, db: SQLiteStorage, settings: Settings) -> None:
     account = resolve_account(message, db, settings)
     if not account or not account.student_id:
-        await message.answer("Карточка не найдена. Открой Mini App или заполни анкету заново.", reply_markup=first_start_menu(settings.telegram_webapp_url))
+        await message.answer("Карточка не найдена. Открой Mini App или заполни анкету заново.", reply_markup=first_start_menu(personal_webapp_url(db, settings, message.from_user.id)))
         return
     student = db.get_student(account.student_id)
     if student is None:
-        await message.answer("Карточка не найдена. Открой Mini App или заполни анкету заново.", reply_markup=first_start_menu(settings.telegram_webapp_url))
+        await message.answer("Карточка не найдена. Открой Mini App или заполни анкету заново.", reply_markup=first_start_menu(personal_webapp_url(db, settings, message.from_user.id)))
         return
     text = format_student_public_card(student)
     if settings.teacher_chat_link:

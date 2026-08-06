@@ -67,9 +67,15 @@ def back_button(callback_data: str) -> InlineKeyboardButton:
 
 
 def student_menu(webapp_url: str = "") -> ReplyKeyboardMarkup:
+    """Одна кнопка входа вместо двух.
+
+    В web_app лежит персональная постоянная ссылка чата, если она передана:
+    тогда кабинет открывается уже авторизованным, даже если Telegram не
+    отдал initData. Отдельная «Браузерная версия» больше не нужна — это та
+    же ссылка, её можно скопировать командой /link.
+    """
     rows = [
-        [KeyboardButton(text="Открыть Mini App", web_app=WebAppInfo(url=webapp_url))] if webapp_url else [],
-        [KeyboardButton(text="Браузерная версия")],
+        [KeyboardButton(text="Кабинет", web_app=WebAppInfo(url=webapp_url))] if webapp_url else [],
         [KeyboardButton(text="Помощь")],
     ]
     return ReplyKeyboardMarkup(keyboard=[row for row in rows if row], resize_keyboard=True)
@@ -77,8 +83,7 @@ def student_menu(webapp_url: str = "") -> ReplyKeyboardMarkup:
 
 def first_start_menu(webapp_url: str = "") -> ReplyKeyboardMarkup:
     rows = [
-        [KeyboardButton(text="Открыть Mini App", web_app=WebAppInfo(url=webapp_url))] if webapp_url else [],
-        [KeyboardButton(text="Браузерная версия")],
+        [KeyboardButton(text="Кабинет", web_app=WebAppInfo(url=webapp_url))] if webapp_url else [],
         [KeyboardButton(text="Заполнить анкету в чате")],
     ]
     return ReplyKeyboardMarkup(

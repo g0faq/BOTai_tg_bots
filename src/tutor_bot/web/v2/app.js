@@ -177,6 +177,9 @@ function tutorScreens(admin) {
             addPayment: () => form("payment"),
             addNote: () => form("progress", { studentId: model.student.id, topics: topicsFor(admin, model.student.id) }),
             addPlanItem: () => form("planItem", { studentId: model.student.id }),
+            cleanupSchedule: () => form("scheduleCleanup", {
+              studentId: model.student.id, studentName: model.student.name,
+            }),
             togglePlanItem: (id) => {
               const item = model.plan.find((p) => p.id === id);
               return run("План обновлён", () => api.updatePlanItem(model.student.id, id, {

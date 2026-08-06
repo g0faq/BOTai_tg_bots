@@ -1368,3 +1368,15 @@
   padding: 0 var(--space-3);
   font-size: var(--fs-meta);
 }
+
+/* Стабильное расписание: несколько пар «день + время» за один проход */
+.slot-rows { display: flex; flex-direction: column; gap: var(--space-2); }
+.slot-row { display: grid; grid-template-columns: minmax(0, 1fr) 110px 32px; gap: var(--space-2); align-items: end; }
+.slot-row__remove {
+  height: var(--input);
+  color: var(--text-3);
+  border: var(--hair) solid var(--border-hair);
+  border-radius: var(--radius-1);
+}
+.cleanup-preview { display: flex; flex-direction: column; gap: var(--space-2); }
+.form-error { color: var(--sem-debt-text); border-color: var(--sem-debt); }

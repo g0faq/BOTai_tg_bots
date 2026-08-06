@@ -353,8 +353,16 @@ def browser_base_path(settings: Settings) -> str:
 
 
 def browser_entry_path(settings: Settings) -> str:
+    """Куда вернуть пользователя после входа по ссылке доступа.
+
+    Cookie ставится на browser_base_path, поэтому подпапка интерфейса
+    добавляется только к адресу возврата — сессия остаётся действительной
+    и для корня, и для /v2.
+    """
     path = browser_base_path(settings)
-    return "/" if path == "/" else f"{path}/"
+    base = "" if path == "/" else path
+    ui = (settings.browser_ui_path or "").strip().rstrip("/")
+    return f"{base}{ui}/" if (base or ui) else "/"
 
 
 def browser_cookie_name(settings: Settings) -> str:
@@ -1839,8 +1847,22 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return {"commit": os.getenv("BUILD_COMMIT", "").strip() or "unknown"}
 
     @app.get("/healthz")
-    def healthz() -> dict[str, str]:
-        return {"status": "ok", "version": APP_VERSION}
+    def healthz() -> dict[str, Any]:
+        # Признак живости цикла напоминаний: он крутится в процессе бота и
+        # снаружи не виден, но пишет reminder_sent_at в ту же базу, которую
+        # читает веб. Запрос только на чтение и не может уронить healthz —
+        # код ответа всегда 200.
+        payload: dict[str, Any] = {"status": "ok", "version": APP_VERSION}
+        try:
+            last = state.db.last_reminder_sent_at()
+            payload["reminder_last_sent"] = last.isoformat() if last else None
+            payload["reminder_age_hours"] = (
+                round((state.settings.local_now() - last).total_seconds() / 3600, 1) if last else None
+            )
+        except Exception:
+            logging.exception("healthz: failed to read reminder state")
+            payload["reminder_last_sent"] = "unknown"
+        return payload
 
     @app.get("/login/{token}")
     def accept_browser_invite(token: str) -> RedirectResponse:

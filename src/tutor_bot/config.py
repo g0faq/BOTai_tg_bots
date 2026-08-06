@@ -58,6 +58,10 @@ class Settings:
     google_sheets_credentials_json: str = ""
     webapp_url: str = ""
     webapp_url_aliases: list[str] | None = None
+    # Подпапка интерфейса внутри webapp_url: "" — старый фронт в корне,
+    # "/v2" — новый. Задаётся на инстанс, а не на процесс: uvicorn держит
+    # два приложения сразу, и у клиентского интерфейс свой.
+    browser_ui_path: str = ""
     master_admin_ids: list[int] | None = None
     hub_bot_token: str = ""
     hub_webapp_url: str = ""
@@ -139,6 +143,7 @@ def load_settings() -> Settings:
         google_sheets_credentials_json=_getenv("GOOGLE_SHEETS_CREDENTIALS_JSON"),
         webapp_url=_getenv("WEBAPP_URL", "http://127.0.0.1:8000"),
         webapp_url_aliases=_parse_str_list(_getenv("WEBAPP_URL_ALIASES")),
+        browser_ui_path=_getenv("BROWSER_UI_PATH", "").strip().rstrip("/"),
         master_admin_ids=_parse_int_list(_getenv("MASTER_ADMIN_IDS")) or _parse_int_list(_getenv("ADMIN_TELEGRAM_IDS")),
         hub_bot_token=_getenv("HUB_BOT_TOKEN"),
         hub_webapp_url=_getenv("HUB_WEBAPP_URL", _getenv("WEBAPP_URL", "http://127.0.0.1:8000").rstrip("/") + "/hub"),

@@ -76,6 +76,16 @@ function profileTab(model, actions) {
     TaskChart({ levels: s.levels, goal: s.levelsGoal, toneOf: levelTone }),
   );
 
+  if (actions.cleanupSchedule) {
+    box.append(
+      SectionCaption({ title: "Стабильное расписание" }),
+      el("div", { class: "screen__pad" }, [
+        el("p", { class: "screen__note", text: "Удалит правила повторения и отправит будущие неоплаченные занятия в архив. Проведённые, прошедшие и оплаченные останутся на месте." }),
+        Button({ kind: "danger", label: "Очистить стабильное расписание", full: true, onClick: actions.cleanupSchedule }),
+      ]),
+    );
+  }
+
   if (model.taskNotes.length) {
     box.append(SectionCaption({ title: "Заметки по заданиям", count: model.taskNotes.length }));
     box.append(el("div", { class: "list" }, model.taskNotes.map((n) =>

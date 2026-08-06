@@ -15,6 +15,12 @@ import * as api from "../core/api.js";
 import * as dict from "../core/dict.js";
 import * as fmt from "../core/format.js";
 
+const WEEKDAY_OPTIONS = [
+  { value: "1", label: "Понедельник" }, { value: "2", label: "Вторник" }, { value: "3", label: "Среда" },
+  { value: "4", label: "Четверг" }, { value: "5", label: "Пятница" }, { value: "6", label: "Суббота" },
+  { value: "7", label: "Воскресенье" },
+];
+
 const TZ = ["МСК-1", "МСК+0", "МСК+1", "МСК+2", "МСК+3", "МСК+4", "МСК+5", "МСК+6", "МСК+7", "МСК+8"];
 
 const group = (title, fields) =>
@@ -240,24 +246,52 @@ const FORMS = {
   scheduleRule: ({ ctx }) => {
     const form = createForm({
       student_id: String(ctx.selectedStudentId || ctx.students[0]?.id || ""),
-      weekday: "1",
-      lesson_time: "18:00",
       duration_minutes: 60,
       starts_at: todayInput(),
       ends_at: "",
     });
+    // Сервер принимает список пар «день + время» в slots, поэтому за один
+    // проход можно завести хоть всю неделю.
+    const slots = [{ weekday: "1", lesson_time: "18:00" }];
+    const slotsHost = el("div", { class: "slot-rows" });
+
+    const renderSlots = () => {
+      slotsHost.replaceChildren(...slots.map((slot, i) =>
+        el("div", { class: "slot-row" }, [
+          Select({
+            label: i === 0 ? "День недели" : "",
+            options: WEEKDAY_OPTIONS,
+            value: slot.weekday,
+            onChange: (v) => { slot.weekday = v; },
+          }),
+          Field({
+            label: i === 0 ? "Время" : "",
+            type: "time",
+            value: slot.lesson_time,
+            state: "filled",
+            onInput: (v) => { slot.lesson_time = v; },
+          }),
+          slots.length > 1
+            ? el("button", {
+                type: "button", class: "slot-row__remove", "aria-label": "Убрать день",
+                text: "✕", onClick: () => { slots.splice(i, 1); renderSlots(); },
+              })
+            : el("span", {}),
+        ])));
+    };
+    renderSlots();
+
     return {
       title: "Стабильное расписание",
       submitLabel: "Добавить стабильное расписание",
       body: [
         group("Дни и время", [
           Select({ label: "Ученик", options: studentOptions(ctx.students), ...form.bind("student_id") }),
-          Select({ label: "День недели", options: [
-            { value: "1", label: "Понедельник" }, { value: "2", label: "Вторник" }, { value: "3", label: "Среда" },
-            { value: "4", label: "Четверг" }, { value: "5", label: "Пятница" }, { value: "6", label: "Суббота" },
-            { value: "7", label: "Воскресенье" },
-          ], ...form.bind("weekday") }),
-          Field({ label: "Время", type: "time", ...form.bind("lesson_time") }),
+          slotsHost,
+          Button({
+            kind: "second", label: "Добавить день и время", full: true,
+            onClick: () => { slots.push({ weekday: "1", lesson_time: "18:00" }); renderSlots(); },
+          }),
           Field({ label: "Длительность, мин", type: "number", ...form.bind("duration_minutes") }),
         ]),
         group("Период", [
@@ -267,12 +301,64 @@ const FORMS = {
       ],
       submit: () => api.createScheduleRule({
         student_id: Number(form.get("student_id")),
-        weekdays: [Number(form.get("weekday"))],
-        lesson_time: form.get("lesson_time"),
+        slots: slots.map((x) => ({ weekday: Number(x.weekday), lesson_time: x.lesson_time })),
         duration_minutes: Number(form.get("duration_minutes")),
         starts_at: form.get("starts_at") || undefined,
         ends_at: form.get("ends_at") || undefined,
       }),
+    };
+  },
+
+  /* Очистка стабильного расписания: сначала предпросмотр с числами, затем
+     отмена. Занятия не удаляются, они уезжают в архив календаря. */
+  scheduleCleanup: ({ studentId, studentName, onDone }) => {
+    const preview = el("div", { class: "cleanup-preview" }, [
+      el("p", { class: "modal-note", text: "Считаю…" }),
+    ]);
+    let plan = null;
+    return {
+      title: "Очистить стабильное расписание",
+      submitLabel: "",
+      async load() {
+        plan = await api.previewScheduleCleanup(studentId);
+        const skipped = (plan.skipped || [])
+          .map((s) => el("p", { class: "modal-note", text: `Пропущено ${s.count} — ${s.reason}` }));
+        const nothing = !plan.cancel_count && !plan.rules;
+        preview.replaceChildren(
+          el("p", { class: "modal-note", text: studentName }),
+          el("p", { class: "modal-note" }, ["Правил стабильного расписания: ", el("strong", { text: String(plan.rules) })]),
+          el("p", { class: "modal-note" }, ["Будет отменено занятий: ", el("strong", { text: String(plan.cancel_count) })]),
+          el("p", { class: "modal-note" }, ["Будет пропущено: ", el("strong", { text: String(plan.skipped_total) })]),
+          plan.first_date && plan.last_date
+            ? el("p", { class: "modal-note", text: `С ${fmt.dateLong(plan.first_date)} по ${fmt.dateLong(plan.last_date)}.` })
+            : null,
+          ...skipped,
+          el("p", { class: "modal-note", text: "Занятия не удаляются — они переедут в архив календаря." }),
+          nothing
+            ? el("p", { class: "modal-note", text: "Очищать нечего." })
+            : Button({
+                kind: "danger", full: true, label: `Очистить: отменить ${plan.cancel_count}`,
+                onClick: async (event) => {
+                  const btn = event.currentTarget;
+                  btn.disabled = true;
+                  btn.textContent = "Очищаю…";
+                  try {
+                    const done = await api.runScheduleCleanup(studentId);
+                    preview.replaceChildren(
+                      el("p", { class: "modal-note", text: `Отменено ${done.cancel_count} занятий, удалено правил: ${done.rules}.` }),
+                      el("p", { class: "modal-note", text: "Отменённые занятия доступны в календаре по кнопке «Архив»." }),
+                    );
+                    await onDone?.();
+                  } catch (e) {
+                    btn.disabled = false;
+                    btn.textContent = `Очистить: отменить ${plan.cancel_count}`;
+                    preview.append(el("p", { class: "modal-note form-error", text: e?.detail || "Не удалось очистить" }));
+                  }
+                },
+              }),
+        );
+      },
+      body: [preview],
     };
   },
 
@@ -540,7 +626,7 @@ const FORMS = {
 /* ========================================================================= */
 
 export function openForm(name, params = {}, { onDone } = {}) {
-  const def = FORMS[name]?.(params);
+  const def = FORMS[name]?.({ ...params, onDone });
   if (!def) return;
 
   const bodyHost = el("div", { class: "form-body" }, def.body);

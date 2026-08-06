@@ -920,6 +920,17 @@ class SQLiteStorage:
         lessons = [self._row_to_lesson(row) for row in rows]
         return [lesson for lesson in lessons if lesson.ends_at > starts_at]
 
+    def last_reminder_sent_at(self) -> datetime | None:
+        """Когда цикл напоминаний последний раз успешно доставил напоминание.
+
+        Читается веб-процессом, а пишется процессом бота — это единственный
+        внешний признак того, что фоновый цикл жив. Только чтение.
+        """
+        row = self.conn.execute(
+            "SELECT MAX(reminder_sent_at) AS ts FROM lessons WHERE reminder_sent_at IS NOT NULL"
+        ).fetchone()
+        return _parse_dt(row["ts"]) if row and row["ts"] else None
+
     def list_cancelled_lessons_between(
         self,
         starts_at: datetime,

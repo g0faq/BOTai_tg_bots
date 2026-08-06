@@ -27,6 +27,9 @@ sam_settings = replace(
     database_path="/data/sam_zabot.sqlite3",
     webapp_url=f"{telegram_base_url}/client-694590118/",
     webapp_url_aliases=[],
+    # Клиентский инстанс остаётся на старом интерфейсе независимо от того,
+    # что выставлено для основного бота.
+    browser_ui_path="",
 )
 
 app = FastAPI(title="BOTai Telegram bots")

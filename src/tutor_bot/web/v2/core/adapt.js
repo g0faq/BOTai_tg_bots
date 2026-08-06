@@ -164,8 +164,11 @@ export function filterHomeworks(rows, filter) {
 
 /* --- финансы -------------------------------------------------------------- */
 
-export function adaptFinances(admin) {
+export function adaptFinances(admin, { operationFilter = "" } = {}) {
   const f = admin.finances || {};
+  const operations = operationFilter
+    ? (f.payments || []).filter((p) => (p.payment_label || p.status) === operationFilter)
+    : (f.payments || []);
   const debt = Number(f.debt_amount || 0);
   const done = dict.lessonStatus(dict.LESSON_STATUS.CONDUCTED);
   const wait = dict.paymentStatus(dict.PAYMENT_STATUS.STUDENT_MARKED);
@@ -207,8 +210,8 @@ export function adaptFinances(admin) {
       left: `${fmt.hours(a.remaining_lessons || 0)} осталось`,
       notch: notchOf(dict.paymentStatus(dict.PAYMENT_STATUS.CONFIRMED)),
     })),
-    operationsCount: (f.payments || []).length,
-    operationDays: groupByDay(f.payments || [], (p) => p.confirmed_at || p.created_at).map((day) => ({
+    operationsCount: operations.length,
+    operationDays: groupByDay(operations, (p) => p.confirmed_at || p.created_at).map((day) => ({
       title: fmt.dayTitle(day.date),
       total: fmt.money(day.items.reduce((s, p) => s + Number(p.amount || 0), 0)),
       items: day.items.map((p) => ({

@@ -33,15 +33,15 @@ if [[ -z "${BUILD_COMMIT:-}" ]]; then
 fi
 export BUILD_COMMIT
 
-# Какой мини-апп открывает кнопка в боте. По умолчанию старый; чтобы
-# переключиться на новый фронт, достаточно задать WEBAPP_UI=v2 в переменных
-# Amvera и перезапустить. Обратно — убрать переменную. Код при этом не
-# меняется, поэтому откат мгновенный.
-WEBAPP_UI="${WEBAPP_UI:-legacy}"
-if [[ "$WEBAPP_UI" == "v2" ]]; then
-  G0_WEBAPP_URL="$TELEGRAM_WEBAPP_BASE_URL/v2/"
-else
+# Какой мини-апп открывает кнопка в боте. По умолчанию новый интерфейс.
+# Чтобы вернуть старый — задать WEBAPP_UI=legacy в переменных Amvera и
+# перезапустить. Код при этом не меняется, поэтому откат занимает минуту и
+# не требует выката. Старый фронт никуда не делся и лежит по адресу «/».
+WEBAPP_UI="${WEBAPP_UI:-v2}"
+if [[ "$WEBAPP_UI" == "legacy" ]]; then
   G0_WEBAPP_URL="$TELEGRAM_WEBAPP_BASE_URL/"
+else
+  G0_WEBAPP_URL="$TELEGRAM_WEBAPP_BASE_URL/v2/"
 fi
 
 export BOT_RUNTIME=server

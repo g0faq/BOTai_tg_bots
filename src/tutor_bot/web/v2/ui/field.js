@@ -11,10 +11,16 @@ export function Field({
   hint = "",
   tail = "",
   mono = false,
+  type = "text",       // text | number | date | datetime-local | time
+  name = "",
+  step = "",
   onInput,
 } = {}) {
   const input = el("input", {
-    class: `field__input${mono ? " num" : ""}`,
+    class: `field__input${mono || type !== "text" ? " num" : ""}`,
+    type,
+    name: name || null,
+    step: step || null,
     value,
     placeholder,
     disabled: state === "off" || state === "loading",

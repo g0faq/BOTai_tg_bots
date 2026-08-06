@@ -14,6 +14,7 @@ import { Toast } from "./ui/feedback.js";
 import * as api from "./core/api.js";
 import * as adapt from "./core/adapt.js";
 import * as fmt from "./core/format.js";
+import * as dict from "./core/dict.js";
 
 import { OverviewScreen } from "./screens/overview.js";
 import { CalendarScreen } from "./screens/calendar.js";
@@ -27,6 +28,7 @@ import {
   ClientPaymentsScreen, ClientProfileScreen,
 } from "./screens/client.js";
 import { RegisterScreen, LoadingScreen, ErrorScreen } from "./screens/service.js";
+import { openForm } from "./screens/forms.js";
 
 const TUTOR_TABS = [
   { value: "overview", label: "Обзор" }, { value: "students", label: "Ученики" },
@@ -47,6 +49,7 @@ const view = {
   homeworkFilter: "all",
   calendarMode: "week",
   calendarArchive: false,
+  operationFilter: "",
   cardTab: "profile",
 };
 
@@ -73,11 +76,29 @@ async function run(label, fn) {
 let router = null;
 let shell = null;
 
+/** Контекст, который нужен формам: список учеников и выбранный ученик. */
+function formCtx() {
+  const p = getState().payload || {};
+  return {
+    students: p.admin?.students || (p.dashboard?.student ? [p.dashboard.student] : []),
+    selectedStudentId: getState().selectedStudentId,
+  };
+}
+
+const form = (name, params = {}) => openForm(name, { ctx: formCtx(), ...params }, {
+  onDone: () => reload().catch(() => toast("Не удалось обновить", "debt")),
+});
+
 async function reload() {
   const payload = await api.getMe();
   setPayload(payload);
   render();
 }
+
+const findLesson = (admin, id) =>
+  [...(admin.calendar || []), ...(admin.calendar_archive || [])].find((l) => Number(l.id) === Number(id));
+const topicsFor = (admin, id) =>
+  (admin.topics_by_student || {})[id] || (admin.topics_by_student || {})[String(id)] || [];
 
 /* --- сборка экранов ------------------------------------------------------- */
 
@@ -88,12 +109,12 @@ function tutorScreens(admin) {
         model: adapt.adaptOverview(admin),
         actions: {
           openCalendar: () => router.go("calendar"),
-          openLesson: () => toast("Редактирование занятия — в следующей волне"),
-          markConducted: () => toast("Отметка проведения — в следующей волне"),
-          addLesson: () => toast("Форма занятия — в следующей волне"),
-          addHomework: () => toast("Форма домашки — в следующей волне"),
-          addStudent: () => toast("Форма ученика — в следующей волне"),
-          addPayment: () => toast("Форма оплаты — в следующей волне"),
+          openLesson: (id) => form("lesson", { lesson: findLesson(admin, id) }),
+          markConducted: () => { const n = admin.summary?.next_lesson; if (n) run("Занятие проведено", () => api.updateLesson(n.id, { status: dict.LESSON_STATUS.CONDUCTED })); },
+          addLesson: () => form("lesson"),
+          addHomework: () => form("homework"),
+          addStudent: () => form("student"),
+          addPayment: () => form("payment"),
         },
       })),
     }),
@@ -114,7 +135,7 @@ function tutorScreens(admin) {
             setPrep: (v) => { view.studentFilters.prep = v; render(); },
             setSort: (v) => { view.studentFilters.sort = v; render(); },
             openStudent: (id) => { setState({ selectedStudentId: id }); router.go("student-card"); },
-            createStudent: () => toast("Форма ученика — в следующей волне"),
+            createStudent: () => form("student"),
           },
         }));
       },
@@ -129,14 +150,14 @@ function tutorScreens(admin) {
           actions: {
             setTab: (v) => { view.cardTab = v; render(); },
             back: () => router.go("students"),
-            edit: () => toast("Редактирование — в следующей волне"),
-            invite: () => run("Ссылка создана", () => api.createStudentBrowserInvite(model.student.id, { role: "student" })),
-            openProgress: () => toast("Правка прогресса — в следующей волне"),
-            addLesson: () => toast("Форма занятия — в следующей волне"),
-            addHomework: () => toast("Форма домашки — в следующей волне"),
-            addPayment: () => toast("Форма оплаты — в следующей волне"),
-            addNote: () => toast("Форма заметки — в следующей волне"),
-            addPlanItem: () => toast("Пункт плана — в следующей волне"),
+            edit: () => form("student", { student: (admin.students || []).find((x) => Number(x.id) === Number(getState().selectedStudentId)) }),
+            invite: () => form("browserInvite", { studentId: model.student.id }),
+            openProgress: () => form("progress", { studentId: model.student.id, topics: topicsFor(admin, model.student.id) }),
+            addLesson: () => form("lesson"),
+            addHomework: () => form("homework"),
+            addPayment: () => form("payment"),
+            addNote: () => form("progress", { studentId: model.student.id, topics: topicsFor(admin, model.student.id) }),
+            addPlanItem: () => form("planItem", { studentId: model.student.id }),
             togglePlanItem: (id) => {
               const item = model.plan.find((p) => p.id === id);
               return run("План обновлён", () => api.updatePlanItem(model.student.id, id, {
@@ -159,10 +180,10 @@ function tutorScreens(admin) {
           markConducted: (id) => run("Занятие проведено", () => api.updateLesson(id, { status: "проведено" })),
           confirmPayment: (id) => run("Оплата подтверждена", () => api.confirmLesson(id)),
           deleteClosedSlot: (id) => run("Окно открыто", () => api.deleteClosedSlot(id)),
-          addLesson: () => toast("Форма занятия — в следующей волне"),
-          freeSlots: () => toast("Свободные окна — в следующей волне"),
-          addRule: () => toast("Стабильное расписание — в следующей волне"),
-          addClosedSlot: () => toast("Нерабочие часы — в следующей волне"),
+          addLesson: () => form("lesson"),
+          freeSlots: () => form("freeSlots", { onPick: (startsAt) => form("lesson", { lesson: { starts_at: startsAt, duration_minutes: 60 } }) }),
+          addRule: () => form("scheduleRule"),
+          addClosedSlot: () => form("closedSlot"),
         },
       })),
     }),
@@ -177,8 +198,8 @@ function tutorScreens(admin) {
           canCreate: true,
           actions: {
             setFilter: (v) => { view.homeworkFilter = v; render(); },
-            createHomework: () => toast("Форма домашки — в следующей волне"),
-            openHomework: () => toast("Карточка домашки — в следующей волне"),
+            createHomework: () => form("homework"),
+            openHomework: (id) => form("homework", { homework: (admin.homeworks || []).find((h) => Number(h.id) === Number(id)) }),
           },
         }));
       },
@@ -186,12 +207,13 @@ function tutorScreens(admin) {
 
     finances: () => ({
       mount: (c) => c.append(FinancesScreen({
-        ...adapt.adaptFinances(admin),
+        ...adapt.adaptFinances(admin, { operationFilter: view.operationFilter }),
+        filter: view.operationFilter,
         actions: {
-          createPayment: () => toast("Форма оплаты — в следующей волне"),
+          createPayment: () => form("payment"),
           confirmPayment: (id) => run("Оплата подтверждена", () => api.confirmPayment(id)),
-          editAdvance: () => toast("Правка аванса — в следующей волне"),
-          setFilter: () => toast("Фильтр операций — в следующей волне"),
+          editAdvance: (id) => form("advance", { advance: (admin.finances?.advances || []).find((a) => Number(a.payment_id) === Number(id)) }),
+          setFilter: (v) => { view.operationFilter = v; render(); },
         },
       })),
     }),
@@ -204,8 +226,8 @@ function tutorScreens(admin) {
         workingDays: admin.profile?.working_days || [1, 2, 3, 4, 5, 6, 7],
         actions: {
           back: () => router.go("overview"),
-          invite: () => run("Ссылка кабинета создана", () => api.createTutorBrowserInvite({})),
-          save: () => toast("Сохранение профиля — в следующей волне"),
+          invite: () => form("browserInvite", {}),
+          save: () => run("Профиль сохранён", () => api.updateTutorProfile({ ...(admin.profile || {}) })),
         },
       })),
     }),
@@ -235,7 +257,7 @@ function clientScreens(payload) {
           canCreate: false,
           actions: {
             setFilter: (v) => { view.homeworkFilter = v; render(); },
-            openHomework: () => toast("Сдача домашки — в следующей волне"),
+            openHomework: (id) => form("homeworkSubmit", { homework: (payload.dashboard?.homeworks || []).find((h) => Number(h.id) === Number(id)) }),
           },
         }));
       },
@@ -251,9 +273,9 @@ function clientScreens(payload) {
               status: item?.done ? "не начато" : "выполнено",
             }));
           },
-          editProgress: () => toast("Правка прогресса — в следующей волне"),
-          addNote: () => toast("Заметка — в следующей волне"),
-          addPlanItem: () => toast("Пункт плана — в следующей волне"),
+          editProgress: () => form("progress", { studentId: m.student.id, topics: payload.dashboard?.topics || [] }),
+          addNote: () => form("progress", { studentId: m.student.id, topics: payload.dashboard?.topics || [] }),
+          addPlanItem: () => form("planItem", { studentId: model.student.id }),
         },
       })),
     }),
@@ -268,8 +290,8 @@ function clientScreens(payload) {
         facts: m.facts, links: m.links,
         canEdit: m.canEdit, canDelete: payload.role === "student",
         actions: {
-          edit: () => toast("Редактирование профиля — в следующей волне"),
-          remove: () => toast("Удаление профиля — в следующей волне"),
+          edit: () => form("student", { student: payload.dashboard?.student }),
+          remove: () => run("Профиль удалён", () => api.deleteMyStudent()),
         },
       })),
     }),
@@ -334,12 +356,12 @@ function render() {
   shell.fab.replaceChildren();
   const fab = isTutor
     ? Fab({ actions: [
-        { label: "Добавить ученика", onClick: () => toast("Форма ученика — в следующей волне") },
-        { label: "Разовая запись", onClick: () => toast("Форма занятия — в следующей волне") },
-        { label: "Стабильное расписание", onClick: () => toast("Стабильное расписание — в следующей волне") },
-        { label: "Нерабочие часы", onClick: () => toast("Нерабочие часы — в следующей волне") },
-        { label: "Создать домашку", onClick: () => toast("Форма домашки — в следующей волне") },
-        { label: "Добавить оплату", onClick: () => toast("Форма оплаты — в следующей волне") },
+        { label: "Добавить ученика", onClick: () => form("student") },
+        { label: "Разовая запись", onClick: () => form("lesson") },
+        { label: "Стабильное расписание", onClick: () => form("scheduleRule") },
+        { label: "Нерабочие часы", onClick: () => form("closedSlot") },
+        { label: "Создать домашку", onClick: () => form("homework") },
+        { label: "Добавить оплату", onClick: () => form("payment") },
       ] })
     : null;
   if (fab) shell.fab.append(fab);

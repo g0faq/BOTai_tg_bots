@@ -15,6 +15,29 @@ function telegramInitData() {
   return globalThis.Telegram?.WebApp?.initData || "";
 }
 
+/**
+ * Достаёт читаемый текст из detail. Сервер отдаёт его тремя способами:
+ * строкой, списком конфликтов (409 на занятии) и объектом с описанием
+ * занятого слота — «Ошибка 409» пользователю ничего не объясняет.
+ */
+function readableDetail(payload) {
+  const detail = payload && typeof payload === "object" ? payload.detail : payload;
+  if (!detail) return null;
+  if (typeof detail === "string") return detail;
+  if (Array.isArray(detail)) {
+    const texts = detail.map((d) => (typeof d === "string" ? d : d?.message || d?.msg)).filter(Boolean);
+    return texts.length ? texts.join(" ") : null;
+  }
+  if (typeof detail === "object") {
+    if (typeof detail.message === "string") return detail.message;
+    if (Array.isArray(detail.conflicts) && detail.conflicts.length) {
+      const first = detail.conflicts[0];
+      return typeof first === "string" ? first : first?.message || null;
+    }
+  }
+  return null;
+}
+
 export class ApiError extends Error {
   constructor(status, detail, payload) {
     super(detail || `Ошибка ${status}`);
@@ -59,8 +82,7 @@ async function request(path, { method = "GET", body, signal } = {}) {
     }
   }
   if (!response.ok) {
-    const detail = payload && typeof payload === "object" ? payload.detail : payload;
-    throw new ApiError(response.status, typeof detail === "string" ? detail : null, payload);
+    throw new ApiError(response.status, readableDetail(payload), payload);
   }
   return payload;
 }

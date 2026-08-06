@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import logging
 import sqlite3
 from collections.abc import Iterable
 from datetime import UTC, date, datetime
@@ -24,9 +23,6 @@ from tutor_bot.domain.models import (
 
 RECENT_DUPLICATE_SECONDS = 10 * 60
 OLD_CONFIRMED_LESSON_PAYMENT_STATUS = "подтверждено репетитором"
-BUSY_TIMEOUT_MS = 5000
-
-logger = logging.getLogger(__name__)
 
 
 def utc_now() -> datetime:
@@ -56,40 +52,7 @@ class SQLiteStorage:
         self.conn = sqlite3.connect(self.path, check_same_thread=False)
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA foreign_keys = ON")
-        self._apply_concurrency_pragmas()
         self.init_schema()
-
-    def _apply_concurrency_pragmas(self) -> None:
-        """Бот и веб пишут в один файл из разных процессов.
-
-        Без WAL параллельная запись сериализуется на уровне всей базы, а без
-        busy_timeout вторая запись падает с "database is locked" немедленно.
-        """
-        try:
-            self.conn.execute(f"PRAGMA busy_timeout = {BUSY_TIMEOUT_MS}")
-            self.conn.execute("PRAGMA journal_mode = WAL")
-        except sqlite3.Error:
-            logger.warning("Failed to apply SQLite concurrency pragmas for %s", self.path, exc_info=True)
-            return
-        try:
-            journal_mode = str(self.conn.execute("PRAGMA journal_mode").fetchone()[0])
-            busy_timeout = int(self.conn.execute("PRAGMA busy_timeout").fetchone()[0])
-        except (sqlite3.Error, TypeError, ValueError):
-            logger.warning("Failed to read back SQLite pragmas for %s", self.path, exc_info=True)
-            return
-        if journal_mode.lower() == "wal":
-            logger.info(
-                "SQLite %s: journal_mode=%s busy_timeout=%sms", self.path, journal_mode, busy_timeout
-            )
-        else:
-            # Сетевые и некоторые контейнерные ФС не поддерживают WAL.
-            # Это не повод падать: работаем дальше в journal_mode по умолчанию.
-            logger.warning(
-                "SQLite %s: WAL not applied, journal_mode=%s busy_timeout=%sms",
-                self.path,
-                journal_mode,
-                busy_timeout,
-            )
 
     def close(self) -> None:
         self.conn.close()

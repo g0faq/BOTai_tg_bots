@@ -15,14 +15,12 @@ from tutor_bot.bot.handlers import router
 from tutor_bot.config import Settings, load_dotenv, load_settings
 from tutor_bot.domain.enums import BalanceMode, LessonPaymentStatus, LessonStatus, PlanItemStatus
 from tutor_bot.services.google_sheets import GoogleSheetsReporter
-from tutor_bot.services.heartbeat import write_heartbeat
 from tutor_bot.services.payments import mark_lesson_conducted
 from tutor_bot.services.scheduling import WorkHours
 from tutor_bot.storage.sqlite import SQLiteStorage
 
+
 TRUTHY_ENV_VALUES = {"1", "true", "yes", "on"}
-REMINDER_LOOP_INTERVAL_SECONDS = 60
-REMINDER_RESTART_DELAYS = (5, 10, 20, 60)
 
 
 def build_work_hours(settings: Settings) -> WorkHours:
@@ -35,135 +33,108 @@ def build_work_hours(settings: Settings) -> WorkHours:
 
 
 async def reminder_loop(bot: Bot, db: SQLiteStorage, settings: Settings) -> None:
-    """Бесконечный цикл напоминаний.
-
-    Раньше исключение внутри итерации навсегда убивало таск: процесс оставался
-    жив, polling работал, а напоминания молча прекращались. Теперь итерация
-    изолирована, а состояние цикла видно снаружи через heartbeat.
-    """
     while True:
-        try:
-            await run_reminder_iteration(bot, db, settings)
-        except asyncio.CancelledError:
-            raise
-        except Exception as error:
-            logging.exception("Reminder loop iteration failed")
-            write_heartbeat(settings.database_path, last_error=f"{type(error).__name__}: {error}"[:500])
-        else:
-            write_heartbeat(settings.database_path)
-        await asyncio.sleep(REMINDER_LOOP_INTERVAL_SECONDS)
-
-
-async def run_reminder_iteration(bot: Bot, db: SQLiteStorage, settings: Settings) -> None:
-    now = settings.local_now()
-    await auto_complete_lessons(bot, db, settings, now)
-    window_start = now + timedelta(minutes=settings.reminder_minutes_before_lesson)
-    window_end = window_start + timedelta(seconds=70)
-    lessons = db.list_lessons_between(window_start, window_end, include_cancelled=False)
-    for lesson in lessons:
-        if lesson.status != LessonStatus.PLANNED.value or lesson.reminder_sent_at:
-            continue
-        student = db.get_student(lesson.student_id)
-        if student is None:
-            continue
-        previous = [
-            item
-            for item in db.list_student_lessons(student.id, limit=30)
-            if item.status == LessonStatus.CONDUCTED.value
-        ]
-        previous_topic = previous[0].topic if previous else "нет данных"
-        homework = db.get_current_homework(student.id)
-        plan_items = [
-            item
-            for item in db.list_plan_items(student.id)
-            if item.status != PlanItemStatus.DONE.value
-        ]
-        today_plan = plan_items[0].title if plan_items else lesson.next_plan or "не указан"
-
-        admin_text = "\n".join(
-            line
-            for line in [
-                "🔔 Напоминание о занятии",
-                f"Через {settings.reminder_minutes_before_lesson} минут",
-                "",
-                f"Ученик: {student.full_name}",
-                f"Время: {ru_dt_text(lesson.starts_at, settings.timezone, settings.timezone)}",
-                f"Длительность: {lesson.duration_minutes} мин",
-                "",
-                f"Прошлая тема: {previous_topic or 'нет данных'}",
-                f"План: {today_plan}",
-                f"ДЗ: {homework.status if homework else 'нет активного ДЗ'}",
-                "",
-                f"Телемост: {student.meeting_url}" if student.meeting_url else "Телемост: не указан",
-                f"Доска: {student.board_url}" if student.board_url else "Доска: не указана",
-                f"Чат: {settings.teacher_chat_link}" if settings.teacher_chat_link else "",
+        now = settings.local_now()
+        await auto_complete_lessons(bot, db, settings, now)
+        window_start = now + timedelta(minutes=settings.reminder_minutes_before_lesson)
+        window_end = window_start + timedelta(seconds=70)
+        lessons = db.list_lessons_between(window_start, window_end, include_cancelled=False)
+        for lesson in lessons:
+            if lesson.status != LessonStatus.PLANNED.value or lesson.reminder_sent_at:
+                continue
+            student = db.get_student(lesson.student_id)
+            if student is None:
+                continue
+            previous = [
+                item
+                for item in db.list_student_lessons(student.id, limit=30)
+                if item.status == LessonStatus.CONDUCTED.value
             ]
-            if line
-        )
-        delivered = False
-        for admin_id in settings.admin_telegram_ids:
-            delivered = await safe_send_message(bot, admin_id, admin_text) or delivered
-
-        student_text = "\n".join(
-            line
-            for line in [
-                "🔔 Скоро занятие",
-                f"Начало через {settings.reminder_minutes_before_lesson} минут",
-                "",
-                f"Время: {ru_dt_text(lesson.starts_at, student.timezone, settings.timezone)}",
-                f"Длительность: {lesson.duration_minutes} мин",
-                "",
-                f"Звонок: {student.meeting_url}" if student.meeting_url else "Звонок: ссылка пока не указана",
-                f"Доска: {student.board_url}" if student.board_url else "Доска: ссылка пока не указана",
-                f"Чат с преподавателем: {settings.teacher_chat_link}" if settings.teacher_chat_link else "",
+            previous_topic = previous[0].topic if previous else "нет данных"
+            homework = db.get_current_homework(student.id)
+            plan_items = [
+                item
+                for item in db.list_plan_items(student.id)
+                if item.status != PlanItemStatus.DONE.value
             ]
-            if line
-        )
-        for user in db.list_users_by_student(student.id):
-            delivered = await safe_send_message(bot, user.telegram_id, student_text) or delivered
+            today_plan = plan_items[0].title if plan_items else lesson.next_plan or "не указан"
 
-        # Флаг ставим только после реальной доставки: иначе неудачная отправка
-        # навсегда исключает занятие из выборки и напоминание теряется.
-        if not delivered:
-            logging.warning("Reminder for lesson %s was not delivered, will retry", lesson.id)
-            continue
-        lesson.reminder_sent_at = settings.local_now()
-        db.update_lesson(lesson)
+            admin_text = "\n".join(
+                line
+                for line in [
+                    "🔔 Напоминание о занятии",
+                    f"Через {settings.reminder_minutes_before_lesson} минут",
+                    "",
+                    f"Ученик: {student.full_name}",
+                    f"Время: {ru_dt_text(lesson.starts_at, settings.timezone, settings.timezone)}",
+                    f"Длительность: {lesson.duration_minutes} мин",
+                    "",
+                    f"Прошлая тема: {previous_topic or 'нет данных'}",
+                    f"План: {today_plan}",
+                    f"ДЗ: {homework.status if homework else 'нет активного ДЗ'}",
+                    "",
+                    f"Телемост: {student.meeting_url}" if student.meeting_url else "Телемост: не указан",
+                    f"Доска: {student.board_url}" if student.board_url else "Доска: не указана",
+                    f"Чат: {settings.teacher_chat_link}" if settings.teacher_chat_link else "",
+                ]
+                if line
+            )
+            for admin_id in settings.admin_telegram_ids:
+                await safe_send_message(bot, admin_id, admin_text)
 
-    recent_start = now - timedelta(hours=12)
-    recent_lessons = db.list_lessons_between(recent_start, now, include_cancelled=False)
-    for lesson in recent_lessons:
-        if (
-            lesson.status != LessonStatus.CONDUCTED.value
-            or lesson.post_lesson_reminder_sent_at
-            or lesson.ends_at + timedelta(minutes=10) > now
-            or lesson.payment_status == LessonPaymentStatus.CONFIRMED.value
-        ):
-            continue
-        student = db.get_student(lesson.student_id)
-        if student is None:
-            continue
-        amount = lesson.payment_amount or lesson_price_for_duration(student, lesson.duration_minutes)
-        text = "\n".join(
-            [
-                "💳 Оплата занятия",
-                "",
-                f"Сумма к оплате: {amount} ₽",
-                "Пожалуйста, оплати занятие и отметь оплату в Mini App или пришли чек в бот.",
-                "",
-                "+79779742510",
-                "Строго Т-Банк.",
-            ]
-        )
-        delivered = False
-        for user in db.list_users_by_student(student.id):
-            delivered = await safe_send_message(bot, user.telegram_id, text) or delivered
-        if not delivered:
-            continue
-        lesson.post_lesson_reminder_sent_at = settings.local_now()
-        db.update_lesson(lesson)
+            student_text = "\n".join(
+                line
+                for line in [
+                    "🔔 Скоро занятие",
+                    f"Начало через {settings.reminder_minutes_before_lesson} минут",
+                    "",
+                    f"Время: {ru_dt_text(lesson.starts_at, student.timezone, settings.timezone)}",
+                    f"Длительность: {lesson.duration_minutes} мин",
+                    "",
+                    f"Звонок: {student.meeting_url}" if student.meeting_url else "Звонок: ссылка пока не указана",
+                    f"Доска: {student.board_url}" if student.board_url else "Доска: ссылка пока не указана",
+                    f"Чат с преподавателем: {settings.teacher_chat_link}" if settings.teacher_chat_link else "",
+                ]
+                if line
+            )
+            for user in db.list_users_by_student(student.id):
+                await safe_send_message(bot, user.telegram_id, student_text)
 
-    await remind_debtors_next_day(bot, db, settings, now)
+            lesson.reminder_sent_at = settings.local_now()
+            db.update_lesson(lesson)
+
+        recent_start = now - timedelta(hours=12)
+        recent_lessons = db.list_lessons_between(recent_start, now, include_cancelled=False)
+        for lesson in recent_lessons:
+            if (
+                lesson.status != LessonStatus.CONDUCTED.value
+                or lesson.post_lesson_reminder_sent_at
+                or lesson.ends_at + timedelta(minutes=10) > now
+                or lesson.payment_status == LessonPaymentStatus.CONFIRMED.value
+            ):
+                continue
+            student = db.get_student(lesson.student_id)
+            if student is None:
+                continue
+            amount = lesson.payment_amount or lesson_price_for_duration(student, lesson.duration_minutes)
+            text = "\n".join(
+                [
+                    "💳 Оплата занятия",
+                    "",
+                    f"Сумма к оплате: {amount} ₽",
+                    "Пожалуйста, оплати занятие и отметь оплату в Mini App или пришли чек в бот.",
+                    "",
+                    "+79779742510",
+                    "Строго Т-Банк.",
+                ]
+            )
+            for user in db.list_users_by_student(student.id):
+                await safe_send_message(bot, user.telegram_id, text)
+            lesson.post_lesson_reminder_sent_at = settings.local_now()
+            db.update_lesson(lesson)
+
+        await remind_debtors_next_day(bot, db, settings, now)
+        await asyncio.sleep(60)
 
 
 async def auto_complete_lessons(bot: Bot, db: SQLiteStorage, settings: Settings, now) -> None:
@@ -223,51 +194,6 @@ async def remind_debtors_next_day(bot: Bot, db: SQLiteStorage, settings: Setting
             sent = await safe_send_message(bot, user.telegram_id, text) or sent
         if sent:
             db.mark_debt_reminder_sent(student.id, today)
-
-
-class ReminderSupervisor:
-    """Следит за таском напоминаний и перезапускает его при падении.
-
-    Второй рубеж защиты после try/except внутри самого цикла: сюда попадают
-    только те падения, которые цикл поймать не смог.
-    """
-
-    def __init__(self, bot: Bot, db: SQLiteStorage, settings: Settings) -> None:
-        self._bot = bot
-        self._db = db
-        self._settings = settings
-        self._attempt = 0
-        self._stopped = False
-        self._task: asyncio.Task | None = None
-
-    def start(self) -> None:
-        self._spawn()
-
-    def _spawn(self) -> None:
-        self._task = asyncio.create_task(reminder_loop(self._bot, self._db, self._settings))
-        self._task.add_done_callback(self._on_done)
-
-    def _on_done(self, task: asyncio.Task) -> None:
-        if self._stopped or task.cancelled():
-            return
-        error = task.exception()
-        if error is None:
-            return
-        delay = REMINDER_RESTART_DELAYS[min(self._attempt, len(REMINDER_RESTART_DELAYS) - 1)]
-        self._attempt += 1
-        logging.error("Reminder loop crashed, restarting in %s seconds", delay, exc_info=error)
-        asyncio.create_task(self._restart_after(delay))
-
-    async def _restart_after(self, delay: int) -> None:
-        await asyncio.sleep(delay)
-        if self._stopped:
-            return
-        self._spawn()
-
-    def stop(self) -> None:
-        self._stopped = True
-        if self._task is not None:
-            self._task.cancel()
 
 
 async def safe_send_message(bot: Bot, chat_id: int, text: str) -> bool:
@@ -353,10 +279,9 @@ async def main() -> None:
     )
     dp.include_router(router)
 
-    supervisor = None
+    reminder_task = None
     if not _truthy_env("DISABLE_BACKGROUND_REMINDERS"):
-        supervisor = ReminderSupervisor(bot, db, settings)
-        supervisor.start()
+        reminder_task = asyncio.create_task(reminder_loop(bot, db, settings))
     try:
         while True:
             try:
@@ -367,8 +292,8 @@ async def main() -> None:
             else:
                 break
     finally:
-        if supervisor is not None:
-            supervisor.stop()
+        if reminder_task is not None:
+            reminder_task.cancel()
         db.close()
         await bot.session.close()
 

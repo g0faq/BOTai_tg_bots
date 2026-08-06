@@ -41,7 +41,6 @@ from tutor_bot.domain.models import (
     UserAccount,
 )
 from tutor_bot.main import build_work_hours
-from tutor_bot.services.heartbeat import read_heartbeat
 from tutor_bot.services.homework import submit_homework
 from tutor_bot.services.payments import confirm_payment, reject_payment
 from tutor_bot.services.preparation import knowledge_status
@@ -1812,12 +1811,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return {"version": APP_VERSION}
 
     @app.get("/healthz")
-    def healthz() -> dict[str, Any]:
-        # Всегда 200: реакция Amvera на неуспешный healthcheck неизвестна,
-        # а цикл перезапусков прода хуже, чем деградировавшие напоминания.
-        payload: dict[str, Any] = {"status": "ok", "version": APP_VERSION}
-        payload.update(read_heartbeat(state.settings.database_path))
-        return payload
+    def healthz() -> dict[str, str]:
+        return {"status": "ok", "version": APP_VERSION}
 
     @app.get("/login/{token}")
     def accept_browser_invite(token: str) -> RedirectResponse:

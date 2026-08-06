@@ -4,14 +4,19 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <title>БОТай CRM · v2</title>
+    <title>БОТай CRM</title>
     <link rel="stylesheet" href="./styles/tokens.css" />
     <link rel="stylesheet" href="./styles/base.css" />
     <link rel="stylesheet" href="./styles/ui.css" />
     <style>
       body { padding-bottom: calc(var(--tabbar) + env(safe-area-inset-bottom)); }
-      .screen { padding: var(--space-4) 0; }
+      #root { max-width: 560px; margin: 0 auto; }
+      .app-body { display: block; }
+      .toast-host { position: fixed; left: var(--gutter); right: var(--gutter);
+        bottom: calc(var(--tabbar) + env(safe-area-inset-bottom) + var(--space-3)); z-index: 20; }
+      .toast-host:empty { display: none; }
     </style>
+    <script src="/assets/telegram-web-app.js"></script>
   </head>
   <body>
     <div id="root"></div>

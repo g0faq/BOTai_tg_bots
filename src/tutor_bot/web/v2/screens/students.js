@@ -4,7 +4,7 @@
  * приходят в view-model снаружи.
  */
 
-import { el, num } from "../ui/dom.js";
+import { el, num, append } from "../ui/dom.js";
 import { ScreenHead } from "../ui/section.js";
 import { Button } from "../ui/button.js";
 import { Field, Select } from "../ui/field.js";
@@ -70,7 +70,9 @@ export function StudentsScreen({
       ])
     : null;
 
-  root.append(
+  // append из dom.js отбрасывает null; нативный Element.append вставил бы
+  // строку "null" прямо в разметку.
+  append(root, [
     ScreenHead({
       title: "Ученики",
       count: `${students.length}/${total}`,
@@ -83,7 +85,7 @@ export function StudentsScreen({
     }),
     filterPanel,
     list,
-  );
+  ]);
 
   return root;
 }

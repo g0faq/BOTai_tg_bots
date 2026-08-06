@@ -39,6 +39,9 @@ export function createRouter({ container, onChange } = {}) {
       return;
     }
     unmountCurrent();
+    // Чистим контейнер всегда, а не только когда был предыдущий экран:
+    // иначе заглушка загрузки остаётся лежать под первым смонтированным.
+    if (container) container.replaceChildren();
     const factory = screens.get(id);
     const instance = factory(params) || {};
     if (container) instance.mount?.(container, params);

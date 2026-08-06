@@ -33,11 +33,22 @@ if [[ -z "${BUILD_COMMIT:-}" ]]; then
 fi
 export BUILD_COMMIT
 
+# Какой мини-апп открывает кнопка в боте. По умолчанию старый; чтобы
+# переключиться на новый фронт, достаточно задать WEBAPP_UI=v2 в переменных
+# Amvera и перезапустить. Обратно — убрать переменную. Код при этом не
+# меняется, поэтому откат мгновенный.
+WEBAPP_UI="${WEBAPP_UI:-legacy}"
+if [[ "$WEBAPP_UI" == "v2" ]]; then
+  G0_WEBAPP_URL="$TELEGRAM_WEBAPP_BASE_URL/v2/"
+else
+  G0_WEBAPP_URL="$TELEGRAM_WEBAPP_BASE_URL/"
+fi
+
 export BOT_RUNTIME=server
 export BOT_TOKEN="$G0_BOT_TOKEN"
 export DATABASE_PATH="$G0_DATABASE_PATH"
 export TELEGRAM_WEBAPP_BASE_URL
-export WEBAPP_URL="$TELEGRAM_WEBAPP_BASE_URL/"
+export WEBAPP_URL="$G0_WEBAPP_URL"
 export WEBAPP_HOST=0.0.0.0
 export WEBAPP_PORT="$PORT"
 
@@ -56,7 +67,7 @@ if [[ "$RUN_TELEGRAM_BOTS" =~ ^(1|true|yes|on)$ ]]; then
   env \
     BOT_TOKEN="$G0_BOT_TOKEN" \
     DATABASE_PATH="$G0_DATABASE_PATH" \
-    WEBAPP_URL="$TELEGRAM_WEBAPP_BASE_URL/" \
+    WEBAPP_URL="$G0_WEBAPP_URL" \
     python -m tutor_bot.main &
   pids+=("$!")
 

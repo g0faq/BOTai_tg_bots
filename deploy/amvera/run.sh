@@ -56,6 +56,9 @@ export TELEGRAM_WEBAPP_BASE_URL
 export WEBAPP_URL="$TELEGRAM_WEBAPP_BASE_URL/"
 export TELEGRAM_MINIAPP_URL="$G0_MINIAPP_URL"
 export BROWSER_UI_PATH="$G0_BROWSER_UI_PATH"
+# Если из контейнера плохо ходит api.telegram.org, задайте адрес прокси
+# переменной TELEGRAM_PROXY_URL в панели Amvera и перезапустите.
+export TELEGRAM_PROXY_URL="${TELEGRAM_PROXY_URL:-}"
 export WEBAPP_HOST=0.0.0.0
 export WEBAPP_PORT="$PORT"
 

@@ -7,6 +7,7 @@ from datetime import timedelta
 from pathlib import Path
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.exceptions import TelegramNetworkError
 from aiogram.types import MenuButtonWebApp, WebAppInfo
 
@@ -334,6 +335,25 @@ def assert_polling_allowed() -> None:
     )
 
 
+def build_session() -> AiohttpSession:
+    """Сессия для запросов к Telegram, при необходимости через прокси.
+
+    Замер с прода показал, что из контейнера api.telegram.org отвечает
+    примерно в одной пробе из трёх, тогда как прочий исходящий HTTPS
+    работает без нареканий. При таком канале long polling почти не
+    получает апдейтов: бот жив, но на сообщения не отвечает.
+
+    Лечится это не кодом, а маршрутом. Поэтому адрес прокси берётся из
+    TELEGRAM_PROXY_URL: задали переменную в Amvera и перезапустили —
+    трафик пошёл через неё, ничего пересобирать не нужно.
+    """
+    proxy = os.getenv("TELEGRAM_PROXY_URL", "").strip()
+    if proxy:
+        logging.info("Telegram requests go through proxy %s", proxy.split("@")[-1])
+        return AiohttpSession(proxy=proxy)
+    return AiohttpSession()
+
+
 async def ensure_polling_mode(bot: Bot) -> None:
     """Снять вебхук перед опросом и записать в лог, что было.
 
@@ -369,7 +389,7 @@ async def main() -> None:
     assert_polling_allowed()
 
     db = SQLiteStorage(settings.database_path)
-    bot = Bot(settings.bot_token)
+    bot = Bot(settings.bot_token, session=build_session())
     await setup_miniapp_menu_button(bot, settings, db)
     dp = Dispatcher(
         db=db,

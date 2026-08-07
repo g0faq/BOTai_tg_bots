@@ -6,11 +6,11 @@ import json
 import logging
 import os
 import secrets
-import time
 from contextlib import asynccontextmanager
 from dataclasses import asdict
 from datetime import UTC, date, datetime, time, timedelta
 from pathlib import Path
+from time import monotonic
 from typing import Any
 from urllib.parse import parse_qsl, urlparse
 
@@ -66,7 +66,7 @@ from tutor_bot.storage.sqlite import SQLiteStorage
 # Момент старта процесса: по нему видно, перезапускается ли контейнер.
 # Если бот падает, run.sh завершает весь скрипт (wait -n), и снаружи это
 # выглядит как постоянно обнуляющийся аптайм веба.
-PROCESS_STARTED_AT = time.monotonic()
+PROCESS_STARTED_AT = monotonic()
 
 STATIC_DIR = Path(__file__).resolve().parent / "web" / "static"
 # Новый фронт живёт параллельно старому и не пересекается с ним ни в одном
@@ -1939,7 +1939,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         payload: dict[str, Any] = {
             "status": "ok",
             "version": APP_VERSION,
-            "uptime_seconds": round(time.monotonic() - PROCESS_STARTED_AT),
+            "uptime_seconds": round(monotonic() - PROCESS_STARTED_AT),
         }
         try:
             last = state.db.last_reminder_sent_at()

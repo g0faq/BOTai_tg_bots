@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import secrets
+import time
 from contextlib import asynccontextmanager
 from dataclasses import asdict
 from datetime import UTC, date, datetime, time, timedelta
@@ -61,6 +62,11 @@ from tutor_bot.services.scheduling import (
 )
 from tutor_bot.services.timezones import convert_timezone, normalize_timezone, timezone_label
 from tutor_bot.storage.sqlite import SQLiteStorage
+
+# Момент старта процесса: по нему видно, перезапускается ли контейнер.
+# Если бот падает, run.sh завершает весь скрипт (wait -n), и снаружи это
+# выглядит как постоянно обнуляющийся аптайм веба.
+PROCESS_STARTED_AT = time.monotonic()
 
 STATIC_DIR = Path(__file__).resolve().parent / "web" / "static"
 # Новый фронт живёт параллельно старому и не пересекается с ним ни в одном
@@ -1930,7 +1936,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         # снаружи не виден, но пишет reminder_sent_at в ту же базу, которую
         # читает веб. Запрос только на чтение и не может уронить healthz —
         # код ответа всегда 200.
-        payload: dict[str, Any] = {"status": "ok", "version": APP_VERSION}
+        payload: dict[str, Any] = {
+            "status": "ok",
+            "version": APP_VERSION,
+            "uptime_seconds": round(time.monotonic() - PROCESS_STARTED_AT),
+        }
         try:
             last = state.db.last_reminder_sent_at()
             payload["reminder_last_sent"] = last.isoformat() if last else None

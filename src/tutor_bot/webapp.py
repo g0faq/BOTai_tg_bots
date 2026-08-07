@@ -1948,7 +1948,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 out["pending_updates"] = info.get("pending_update_count")
                 out["last_error"] = info.get("last_error_message")
         except Exception as error:
-            out["error"] = f"{type(error).__name__}: {error}"
+            out["telegram_error"] = f"{type(error).__name__}: {error}"
+
+        # Отличаем «закрыт Telegram» от «нет исходящей сети вообще»: без
+        # этого невозможно понять, к кому идти с проблемой.
+        for name, url in (("dns_and_https", "https://api.github.com/"),):
+            try:
+                async with httpx.AsyncClient(timeout=8) as client:
+                    probe = await client.get(url)
+                    out[name] = probe.status_code
+            except Exception as error:
+                out[name] = f"{type(error).__name__}: {error}"
         return out
 
     @app.get("/api/build")

@@ -14,7 +14,7 @@ from typing import Any
 from urllib.parse import parse_qsl, urlparse
 
 import httpx
-from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi import Depends, FastAPI, Header, HTTPException, Request, Response
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -352,6 +352,23 @@ def browser_base_path(settings: Settings) -> str:
     if not path:
         return "/"
     return path
+
+
+def login_landing(settings: Settings) -> Response:
+    """Ответ на переход по ссылке доступа.
+
+    Раньше здесь был редирект на кабинет. Telegram передаёт initData во
+    фрагменте адреса (#tgWebAppData=...), а фрагмент при редиректе теряется:
+    приложение открывалось без данных пользователя и упиралось в 401, если
+    ещё и cookie не доехала. Поэтому на новом интерфейсе отдаём страницу
+    прямо здесь — фрагмент остаётся, а cookie ставится тем же ответом.
+    Ссылки в странице абсолютные, поэтому адрес значения не имеет.
+    """
+    ui = (settings.browser_ui_path or "").strip().rstrip("/")
+    index = (STATIC_V2_DIR if ui == "/v2" else STATIC_DIR) / "index.html"
+    if index.exists():
+        return FileResponse(index, headers={"Cache-Control": "no-cache, no-store, must-revalidate"})
+    return RedirectResponse(url=browser_entry_path(settings), status_code=303)
 
 
 def browser_entry_path(settings: Settings) -> str:
@@ -1935,7 +1952,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         """
         if verify_chat_token(state.settings, token) is None:
             raise HTTPException(status_code=404, detail="Ссылка недействительна")
-        response = RedirectResponse(url=browser_entry_path(state.settings), status_code=303)
+        response = login_landing(state.settings)
         response.set_cookie(
             chat_cookie_name(state.settings),
             token,
@@ -1968,7 +1985,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             invite["role"],
             now + timedelta(days=session_days),
         )
-        response = RedirectResponse(url=browser_entry_path(state.settings), status_code=303)
+        response = login_landing(state.settings)
         for cookie_name in browser_cookie_names(state.settings):
             response.set_cookie(
                 cookie_name,
@@ -1993,7 +2010,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             hash_browser_token(session_token),
             now + timedelta(days=session_days),
         )
-        response = RedirectResponse(url=browser_entry_path(state.settings), status_code=303)
+        response = login_landing(state.settings)
         for cookie_name in browser_cookie_names(state.settings):
             response.set_cookie(
                 cookie_name,

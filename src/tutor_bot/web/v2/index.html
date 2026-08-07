@@ -71,13 +71,13 @@
         withRetry(function (n) {
           var link = document.createElement("link");
           link.rel = "stylesheet";
-          link.href = "./bundle.css?r=" + n;
+          link.href = "/v2/bundle.css?r=" + n;
           return link;
         }, "стили");
 
         withRetry(function (n) {
           var script = document.createElement("script");
-          script.src = "./bundle.js?r=" + n;
+          script.src = "/v2/bundle.js?r=" + n;
           return script;
         }, "приложение");
       })();

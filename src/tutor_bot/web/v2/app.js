@@ -457,11 +457,15 @@ async function boot() {
   try {
     await reload();
   } catch (error) {
+    // Показываем текст сервера, а не свою догадку: без него причина
+    // 401 неотличима — истёк вход, не дошла подпись, нет профиля.
+    const reason = error?.detail
+      || (error?.status
+        ? "Сервер отклонил запрос. Откройте кабинет из бота ещё раз."
+        : "Нет связи с сервером. Проверьте интернет и повторите — данные сохранены, ничего не потеряно.");
     shell.body.replaceChildren(ErrorScreen({
-      code: `код ${error?.status || "—"} · ${fmt.dayMonth(new Date())}, ${fmt.time(new Date())}`,
-      description: error?.status === 401
-        ? "Открой Mini App из Telegram — там авторизация происходит сама."
-        : "Нет связи с сервером. Проверьте интернет и повторите — данные сохранены, ничего не потеряно.",
+      code: `код ${error?.status || "нет связи"} · ${fmt.dayMonth(new Date())}, ${fmt.time(new Date())}`,
+      description: reason,
       actions: { retry: () => boot() },
     }));
   }

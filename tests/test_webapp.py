@@ -181,7 +181,9 @@ def test_browser_invite_opens_student_dashboard_without_telegram(tmp_path: Path)
     assert invite.status_code == 200
     token = invite.json()["url"].rstrip("/").rsplit("/", 1)[-1]
     login = client.get(f"/login/{token}", follow_redirects=False)
-    assert login.status_code == 303
+    # Не редирект, а сама страница: при редиректе терялся фрагмент с initData.
+    assert login.status_code == 200
+    assert login.headers.get("set-cookie")
     assert "tutor_browser_session" in login.headers["set-cookie"]
 
     response = client.get("/api/me")
@@ -191,7 +193,7 @@ def test_browser_invite_opens_student_dashboard_without_telegram(tmp_path: Path)
     assert payload["dashboard"]["student"]["id"] == student_id
 
     second_login = client.get(f"/login/{token}", follow_redirects=False)
-    assert second_login.status_code == 303
+    assert second_login.status_code == 200
 
 
 def test_tutor_browser_invite_opens_admin_dashboard_without_telegram(tmp_path: Path) -> None:
@@ -209,7 +211,8 @@ def test_tutor_browser_invite_opens_admin_dashboard_without_telegram(tmp_path: P
     assert invite.status_code == 200
     token = invite.json()["url"].rstrip("/").rsplit("/", 1)[-1]
     login = client.get(f"/login/tutor/{token}", follow_redirects=False)
-    assert login.status_code == 303
+    assert login.status_code == 200
+    assert login.headers.get("set-cookie")
     assert "tutor_browser_session" in login.headers["set-cookie"]
 
     response = client.get("/api/me")
@@ -219,7 +222,7 @@ def test_tutor_browser_invite_opens_admin_dashboard_without_telegram(tmp_path: P
     assert "admin" in payload
 
     second_login = client.get(f"/login/tutor/{token}", follow_redirects=False)
-    assert second_login.status_code == 303
+    assert second_login.status_code == 200
 
 
 def test_browser_invite_prefers_primary_domain_over_request_host(tmp_path: Path) -> None:

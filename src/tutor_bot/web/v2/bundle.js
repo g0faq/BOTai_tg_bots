@@ -3063,6 +3063,33 @@ function authHeaders() {
   return headers;
 }
 
+/** Пауза между повторами. */
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Сколько раз повторить запрос при обрыве связи.
+ *
+ * Edge платформы обрывает часть соединений — примерно каждый восьмой
+ * запрос, одинаково на всех адресах. Без повтора это выглядело как
+ * «кабинет не загрузился»: сеть моргнула на /api/me, а пользователь видел
+ * ошибку. Повторяем только то, что безопасно: чтение и сетевые обрывы до
+ * получения ответа.
+ */
+const NETWORK_RETRIES = 3;
+
+async function fetchWithRetry(path, options, retries) {
+  let lastError = null;
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      return await fetch(path, options);
+    } catch (error) {
+      lastError = error;
+      if (attempt < retries) await wait(200 * (attempt + 1));
+    }
+  }
+  throw lastError;
+}
+
 async function request(path, { method = "GET", body, signal } = {}) {
   const options = {
     method,
@@ -3072,7 +3099,9 @@ async function request(path, { method = "GET", body, signal } = {}) {
   };
   if (body !== undefined) options.body = JSON.stringify(body);
 
-  const response = await fetch(path, options);
+  // Повторяем только чтение: повтор записи мог бы создать вторую запись,
+  // если ответ потерялся уже после того, как сервер её сохранил.
+  const response = await fetchWithRetry(path, options, method === "GET" ? NETWORK_RETRIES : 0);
   const text = await response.text();
   let payload = null;
   if (text) {

@@ -5,11 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <title>БОТай CRM</title>
-    <!-- Один файл вместо тридцати: edge обрывает часть запросов, и модульная
-         загрузка почти никогда не доходила целиком. Пересобрать:
-         python3 tools/build_v2.py -->
-    <link rel="stylesheet" href="./bundle.css" />
     <style>
+      /* Пока не приехали стили: тёмный фон и текст ожидания, чтобы экран не
+         был белым и не выглядел сломанным. */
+      html, body { margin: 0; background: #1A1917; color: #EDE9E3;
+        font-family: "Golos Text", system-ui, -apple-system, sans-serif; }
+      #boot { display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 12px; min-height: 70vh; padding: 24px; text-align: center; }
+      #boot p { margin: 0; font-size: 13px; line-height: 18px; color: #A8A29A; max-width: 34ch; }
+      #boot button { margin-top: 8px; height: 44px; padding: 0 18px; border: 0; border-radius: 2px;
+        background: #F2EDE4; color: #1A1917; font-size: 15px; font-weight: 500; }
+
       /* Запас снизу: таббар плюс кнопка «+», иначе она перекрывает
          последнюю строку списка. */
       body { padding-bottom: calc(var(--tabbar) + var(--fab) + var(--space-6) + env(safe-area-inset-bottom)); }
@@ -22,7 +28,59 @@
     <script src="/assets/telegram-web-app.js"></script>
   </head>
   <body>
-    <div id="root"></div>
-    <script src="./bundle.js"></script>
+    <div id="root">
+      <div id="boot"><p>Открываю кабинет…</p></div>
+    </div>
+
+    <script>
+      /* Загрузка с повторами.
+       *
+       * Edge платформы обрывает часть соединений: примерно каждый восьмой
+       * запрос не доходит, одинаково на всех адресах. Один обрыв на любом из
+       * двух файлов оставлял пользователя с пустым экраном. Поэтому каждый
+       * файл грузится с повторами и нарастающей паузой, а если не вышло
+       * совсем — показываем понятное сообщение с кнопкой, а не пустоту.
+       *
+       * Файлы собираются из web/v2/**: python3 tools/build_v2.py
+       */
+      (function () {
+        var MAX = 5;
+
+        function withRetry(make, name) {
+          var tries = 0;
+          (function attempt() {
+            var node = make(tries);
+            node.onerror = function () {
+              if (node.parentNode) node.parentNode.removeChild(node);
+              if (++tries < MAX) setTimeout(attempt, 250 * tries);
+              else fail(name);
+            };
+            document.head.appendChild(node);
+          })();
+        }
+
+        function fail(name) {
+          var boot = document.getElementById("boot");
+          if (!boot || boot.getAttribute("data-failed")) return;
+          boot.setAttribute("data-failed", "1");
+          boot.innerHTML =
+            "<p>Не удалось загрузить кабинет (" + name + "). Связь оборвалась.</p>" +
+            '<button type="button" onclick="location.reload()">Повторить</button>';
+        }
+
+        withRetry(function (n) {
+          var link = document.createElement("link");
+          link.rel = "stylesheet";
+          link.href = "./bundle.css?r=" + n;
+          return link;
+        }, "стили");
+
+        withRetry(function (n) {
+          var script = document.createElement("script");
+          script.src = "./bundle.js?r=" + n;
+          return script;
+        }, "приложение");
+      })();
+    </script>
   </body>
 </html>

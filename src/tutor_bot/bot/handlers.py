@@ -92,11 +92,7 @@ from tutor_bot.services.calendar import build_lesson_ics, calendar_filename
 from tutor_bot.services.google_sheets import GoogleSheetsReporter
 from tutor_bot.services.homework import assign_homework, submit_homework
 from tutor_bot.services.payments import confirm_payment, mark_lesson_conducted, reject_payment
-from tutor_bot.services.personal_link import (
-    chat_link_url,
-    ensure_personal_invite,
-    personal_link_url,
-)
+from tutor_bot.services.personal_link import chat_link_url
 from tutor_bot.services.preparation import (
     EGE_INFORMATICS_TOPICS,
     exam_task_titles,
@@ -466,17 +462,16 @@ def personal_webapp_url(db: SQLiteStorage, settings: Settings, telegram_id: int)
     if not base:
         return ""
     try:
-        account = db.get_user(telegram_id)
-        if account and account.student_id and account.role in {Role.STUDENT.value, Role.PARENT.value}:
-            # У привязанного профиля своя ссылка на роль: та же, что
-            # выдаётся из карточки ученика.
-            token = ensure_personal_invite(
-                db, settings, account.role, int(account.student_id), settings.local_now()
-            )
-            return personal_link_url(settings, token)
-        # Профиля ещё нет — отдаём ссылку чата. Она откроет анкету,
-        # привязанную к этому telegram_id, и продолжит работать после
-        # регистрации.
+        # Ссылка чата и только она: она вычисляется из telegram_id подписью
+        # и не требует ни чтения, ни записи в базу. Раньше здесь заводилось
+        # приглашение, то есть каждый /start писал в тот же файл, куда
+        # пишет веб, — и при совпадении по времени обработчик падал на
+        # «database is locked», а пользователь не получал ответа.
+        #
+        # Роль определяется на сервере при переходе, поэтому одна ссылка
+        # одинаково годится ученику, родителю и тому, кто ещё не завёл
+        # профиль. Именные ссылки на роль по-прежнему выдаются из карточки
+        # ученика.
         return chat_link_url(settings, telegram_id)
     except Exception:
         logging.exception("Failed to build personal cabinet link for %s", telegram_id)

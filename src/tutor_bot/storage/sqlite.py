@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import sqlite3
 from collections.abc import Iterable
 from datetime import UTC, date, datetime
@@ -50,6 +51,14 @@ class SQLiteStorage:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.conn = sqlite3.connect(self.path, check_same_thread=False)
+        # В один файл пишут процесс бота и процесс веба. По умолчанию
+        # busy_timeout равен нулю: параллельная запись падает сразу с
+        # «database is locked», обработчик обрывается и пользователь не
+        # получает ответа. Пять секунд ожидания снимают гонку.
+        try:
+            self.conn.execute("PRAGMA busy_timeout = 5000")
+        except sqlite3.Error:
+            logging.warning("Failed to set busy_timeout", exc_info=True)
         self.conn.row_factory = sqlite3.Row
         self.conn.execute("PRAGMA foreign_keys = ON")
         self.init_schema()

@@ -2454,7 +2454,15 @@ function ClientCalendarScreen({
 } = {}) {
   const root = el("section", { class: "screen screen--client-calendar" });
   root.append(
-    ScreenHead({ title: "Календарь", count: period }),
+    ScreenHead({
+      title: "Календарь",
+      count: period,
+      // Запись живёт и здесь, не только под кнопкой «+»: календарь —
+      // то место, где становится видно, что записаться нужно.
+      primary: actions.book
+        ? Button({ kind: "second", label: "Записаться", onClick: actions.book })
+        : null,
+    }),
     el("div", { class: "screen__seg" }, [
       Segmented({
         items: [{ value: "day", label: "День" }, { value: "week", label: "Неделя" }, { value: "month", label: "Месяц" }],
@@ -2465,7 +2473,13 @@ function ClientCalendarScreen({
   );
 
   if (!days.length) {
-    root.append(EmptyState({ title: "Занятий нет", description: "Записаться можно кнопкой в чате с преподавателем." }));
+    root.append(EmptyState({
+      title: "Занятий нет",
+      description: "Выберите свободное окно — заявка уйдёт преподавателю на подтверждение.",
+      action: actions.book
+        ? Button({ kind: "second", label: "Записаться на занятие", onClick: actions.book })
+        : null,
+    }));
     return root;
   }
 
@@ -3855,6 +3869,97 @@ const FORMS = {
     };
   },
 
+  /* --- запись ученика ------------------------------------------------------ */
+
+  /* Заявка на занятие от ученика.
+   *
+   * Отдельная форма, а не форма занятия репетитора: ученик не выставляет
+   * ни статус, ни стоимость — он выбирает время, а решение остаётся за
+   * преподавателем. Поэтому и endpoint другой, /api/book, и занятие
+   * заводится сразу как заявка.
+   *
+   * Свободные окна показываются здесь же, а не отдельным шагом: выбрать
+   * время вслепую, а потом получить отказ по занятости — худшее, что
+   * может предложить эта форма. Ручной ввод при этом оставлен: горизонт
+   * окон две недели, а попросить можно и дальше.
+   */
+  booking: () => {
+    const form = createForm({ starts_at: "", duration_minutes: 60 });
+
+    const when = Field({ label: "Дата и время", type: "datetime-local", ...form.bind("starts_at") });
+    const whenInput = when.querySelector(".field__input");
+    const slotsHost = el("div", { class: "form-slots" });
+    const durationHost = el("div", {});
+
+    const pick = (value) => {
+      const local = toLocalInput(value);
+      form.set("starts_at", local);
+      whenInput.value = local;
+    };
+
+    async function loadSlots() {
+      slotsHost.replaceChildren(el("p", { class: "screen__note", text: "Ищу свободные окна…" }));
+      try {
+        const data = await api.getAvailableSlots({
+          durationMinutes: Number(form.get("duration_minutes")), days: 14,
+        });
+        const byDay = new Map();
+        for (const slot of data.slots || []) {
+          const start = slot.starts_at || slot.start || slot;
+          const d = fmt.toDate(start);
+          if (!d) continue;
+          const key = fmt.dayTitle(d);
+          if (!byDay.has(key)) byDay.set(key, []);
+          byDay.get(key).push({ time: fmt.time(d), value: start });
+        }
+        slotsHost.replaceChildren(FreeSlots({
+          duration: data.duration_minutes || Number(form.get("duration_minutes")),
+          days: [...byDay.entries()].map(([title, slots]) => ({ title, slots })),
+          onPick: pick,
+        }));
+      } catch {
+        // Окна — подсказка, а не единственный путь: если их не удалось
+        // получить, заявку всё равно можно отправить руками.
+        slotsHost.replaceChildren(el("p", {
+          class: "screen__note",
+          text: "Не удалось загрузить свободные окна. Время можно указать вручную.",
+        }));
+      }
+    }
+
+    const renderDuration = () => durationHost.replaceChildren(DurationPicker({
+      value: form.get("duration_minutes"),
+      allowCustom: false,
+      onSelect: (v) => {
+        form.set("duration_minutes", v);
+        renderDuration();
+        // Окна зависят от длительности: на полтора часа их всегда меньше.
+        loadSlots();
+      },
+    }));
+    renderDuration();
+    loadSlots();
+
+    return {
+      title: "Записаться на занятие",
+      submitLabel: "Отправить заявку",
+      note: "Заявка уйдёт преподавателю: он подтвердит время или предложит другое.",
+      body: [
+        group("Когда", [durationHost, when]),
+        group("Свободные окна на две недели", [slotsHost]),
+      ],
+      submit: () => {
+        if (!form.get("starts_at")) {
+          throw new Error("Выберите свободное окно или укажите дату и время");
+        }
+        return api.book({
+          starts_at: form.get("starts_at"),
+          duration_minutes: Number(form.get("duration_minutes")),
+        });
+      },
+    };
+  },
+
   /* --- свободные окна ------------------------------------------------------ */
 
   freeSlots: ({ onPick }) => ({
@@ -4790,7 +4895,10 @@ function clientScreens(payload) {
     calendar: () => ({
       mount: (c) => c.append(ClientCalendarScreen({
         period: "", mode: view.calendarMode, summary: m.calendarSummary, days: m.calendarDays,
-        actions: { setMode: (v) => { view.calendarMode = v; render(); } },
+        actions: {
+          setMode: (v) => { view.calendarMode = v; render(); },
+          book: () => form("booking"),
+        },
       })),
     }),
     homeworks: () => ({
@@ -4912,7 +5020,11 @@ function render() {
         { label: "Создать домашку", onClick: () => form("homework") },
         { label: "Добавить оплату", onClick: () => form("payment") },
       ] })
-    : null;
+    // Запись на занятие — единственное, что ученик заводит сам. В старом
+    // интерфейсе она была, при переезде вход потерялся: кнопка «+»
+    // собиралась только для репетитора, и записаться стало неоткуда.
+    // Родителю тоже: он записывает ребёнка.
+    : Fab({ actions: [{ label: "Записаться на занятие", onClick: () => form("booking") }] });
   if (fab) shell.fab.append(fab);
 
   view.screen = active;

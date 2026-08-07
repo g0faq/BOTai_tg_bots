@@ -301,7 +301,10 @@ function clientScreens(payload) {
     calendar: () => ({
       mount: (c) => c.append(ClientCalendarScreen({
         period: "", mode: view.calendarMode, summary: m.calendarSummary, days: m.calendarDays,
-        actions: { setMode: (v) => { view.calendarMode = v; render(); } },
+        actions: {
+          setMode: (v) => { view.calendarMode = v; render(); },
+          book: () => form("booking"),
+        },
       })),
     }),
     homeworks: () => ({
@@ -423,7 +426,11 @@ function render() {
         { label: "Создать домашку", onClick: () => form("homework") },
         { label: "Добавить оплату", onClick: () => form("payment") },
       ] })
-    : null;
+    // Запись на занятие — единственное, что ученик заводит сам. В старом
+    // интерфейсе она была, при переезде вход потерялся: кнопка «+»
+    // собиралась только для репетитора, и записаться стало неоткуда.
+    // Родителю тоже: он записывает ребёнка.
+    : Fab({ actions: [{ label: "Записаться на занятие", onClick: () => form("booking") }] });
   if (fab) shell.fab.append(fab);
 
   view.screen = active;

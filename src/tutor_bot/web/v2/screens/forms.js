@@ -595,6 +595,97 @@ const FORMS = {
     };
   },
 
+  /* --- запись ученика ------------------------------------------------------ */
+
+  /* Заявка на занятие от ученика.
+   *
+   * Отдельная форма, а не форма занятия репетитора: ученик не выставляет
+   * ни статус, ни стоимость — он выбирает время, а решение остаётся за
+   * преподавателем. Поэтому и endpoint другой, /api/book, и занятие
+   * заводится сразу как заявка.
+   *
+   * Свободные окна показываются здесь же, а не отдельным шагом: выбрать
+   * время вслепую, а потом получить отказ по занятости — худшее, что
+   * может предложить эта форма. Ручной ввод при этом оставлен: горизонт
+   * окон две недели, а попросить можно и дальше.
+   */
+  booking: () => {
+    const form = createForm({ starts_at: "", duration_minutes: 60 });
+
+    const when = Field({ label: "Дата и время", type: "datetime-local", ...form.bind("starts_at") });
+    const whenInput = when.querySelector(".field__input");
+    const slotsHost = el("div", { class: "form-slots" });
+    const durationHost = el("div", {});
+
+    const pick = (value) => {
+      const local = toLocalInput(value);
+      form.set("starts_at", local);
+      whenInput.value = local;
+    };
+
+    async function loadSlots() {
+      slotsHost.replaceChildren(el("p", { class: "screen__note", text: "Ищу свободные окна…" }));
+      try {
+        const data = await api.getAvailableSlots({
+          durationMinutes: Number(form.get("duration_minutes")), days: 14,
+        });
+        const byDay = new Map();
+        for (const slot of data.slots || []) {
+          const start = slot.starts_at || slot.start || slot;
+          const d = fmt.toDate(start);
+          if (!d) continue;
+          const key = fmt.dayTitle(d);
+          if (!byDay.has(key)) byDay.set(key, []);
+          byDay.get(key).push({ time: fmt.time(d), value: start });
+        }
+        slotsHost.replaceChildren(FreeSlots({
+          duration: data.duration_minutes || Number(form.get("duration_minutes")),
+          days: [...byDay.entries()].map(([title, slots]) => ({ title, slots })),
+          onPick: pick,
+        }));
+      } catch {
+        // Окна — подсказка, а не единственный путь: если их не удалось
+        // получить, заявку всё равно можно отправить руками.
+        slotsHost.replaceChildren(el("p", {
+          class: "screen__note",
+          text: "Не удалось загрузить свободные окна. Время можно указать вручную.",
+        }));
+      }
+    }
+
+    const renderDuration = () => durationHost.replaceChildren(DurationPicker({
+      value: form.get("duration_minutes"),
+      allowCustom: false,
+      onSelect: (v) => {
+        form.set("duration_minutes", v);
+        renderDuration();
+        // Окна зависят от длительности: на полтора часа их всегда меньше.
+        loadSlots();
+      },
+    }));
+    renderDuration();
+    loadSlots();
+
+    return {
+      title: "Записаться на занятие",
+      submitLabel: "Отправить заявку",
+      note: "Заявка уйдёт преподавателю: он подтвердит время или предложит другое.",
+      body: [
+        group("Когда", [durationHost, when]),
+        group("Свободные окна на две недели", [slotsHost]),
+      ],
+      submit: () => {
+        if (!form.get("starts_at")) {
+          throw new Error("Выберите свободное окно или укажите дату и время");
+        }
+        return api.book({
+          starts_at: form.get("starts_at"),
+          duration_minutes: Number(form.get("duration_minutes")),
+        });
+      },
+    };
+  },
+
   /* --- свободные окна ------------------------------------------------------ */
 
   freeSlots: ({ onPick }) => ({

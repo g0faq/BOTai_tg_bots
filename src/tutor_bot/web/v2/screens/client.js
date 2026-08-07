@@ -49,7 +49,15 @@ export function ClientCalendarScreen({
 } = {}) {
   const root = el("section", { class: "screen screen--client-calendar" });
   root.append(
-    ScreenHead({ title: "Календарь", count: period }),
+    ScreenHead({
+      title: "Календарь",
+      count: period,
+      // Запись живёт и здесь, не только под кнопкой «+»: календарь —
+      // то место, где становится видно, что записаться нужно.
+      primary: actions.book
+        ? Button({ kind: "second", label: "Записаться", onClick: actions.book })
+        : null,
+    }),
     el("div", { class: "screen__seg" }, [
       Segmented({
         items: [{ value: "day", label: "День" }, { value: "week", label: "Неделя" }, { value: "month", label: "Месяц" }],
@@ -60,7 +68,13 @@ export function ClientCalendarScreen({
   );
 
   if (!days.length) {
-    root.append(EmptyState({ title: "Занятий нет", description: "Записаться можно кнопкой в чате с преподавателем." }));
+    root.append(EmptyState({
+      title: "Занятий нет",
+      description: "Выберите свободное окно — заявка уйдёт преподавателю на подтверждение.",
+      action: actions.book
+        ? Button({ kind: "second", label: "Записаться на занятие", onClick: actions.book })
+        : null,
+    }));
     return root;
   }
 

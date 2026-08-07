@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <title>БОТай CRM</title>
-    <link rel="stylesheet" href="./styles/tokens.css" />
-    <link rel="stylesheet" href="./styles/base.css" />
-    <link rel="stylesheet" href="./styles/ui.css" />
+    <!-- Один файл вместо тридцати: edge обрывает часть запросов, и модульная
+         загрузка почти никогда не доходила целиком. Пересобрать:
+         python3 tools/build_v2.py -->
+    <link rel="stylesheet" href="./bundle.css" />
     <style>
       /* Запас снизу: таббар плюс кнопка «+», иначе она перекрывает
          последнюю строку списка. */
@@ -22,6 +23,6 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="./app.js"></script>
+    <script src="./bundle.js"></script>
   </body>
 </html>

@@ -1846,11 +1846,26 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             response.headers["Clear-Site-Data"] = '"cache"'
         return response
 
+    class NoCacheStaticFiles(StaticFiles):
+        """Статика, которую клиент обязан перепроверять.
+
+        Без явного Cache-Control WebView Telegram держит старые app.js и
+        стили сколько угодно: у файлов v2 нет строк версии в адресе, и
+        пользователь продолжает видеть предыдущую сборку. С no-cache
+        браузер каждый раз спрашивает сервер, но при совпадении ETag
+        получает пустой 304 — трафика это почти не добавляет.
+        """
+
+        def file_response(self, *args, **kwargs):  # type: ignore[override]
+            response = super().file_response(*args, **kwargs)
+            response.headers["Cache-Control"] = "no-cache, must-revalidate"
+            return response
+
     app.mount("/assets", StaticFiles(directory=STATIC_DIR), name="assets")
     # Монтируем только если каталог на месте: StaticFiles на отсутствующей
     # директории падает на старте и унёс бы оба мини-аппа разом.
     if STATIC_V2_DIR.is_dir():
-        app.mount("/v2", StaticFiles(directory=STATIC_V2_DIR, html=True), name="v2")
+        app.mount("/v2", NoCacheStaticFiles(directory=STATIC_V2_DIR, html=True), name="v2")
     else:
         logging.warning("v2 static directory is missing, /v2 is not mounted: %s", STATIC_V2_DIR)
 

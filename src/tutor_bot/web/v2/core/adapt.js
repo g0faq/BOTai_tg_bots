@@ -230,13 +230,23 @@ export function adaptFinances(admin, { operationFilter = "" } = {}) {
       meta: `${fmt.money(p.amount || p.price || 0)} · ${p.payment_label || p.status || ""}`,
       notch: notchOf(dict.paymentStatus(p.payment_label || dict.PAYMENT_STATUS.STUDENT_MARKED)),
     })),
-    unpaid: (f.unpaid_lessons || []).map((l) => ({
-      id: l.id,
-      name: `${l.student_name || "Занятие"} · ${fmt.dayMonth(l.starts_at)}`,
-      meta: `${fmt.money(lessonPrice(l))} · ${dict.paymentStatus(l.payment_status).label}`,
-      notch: notchOf(dict.paymentStatus(dict.PAYMENT_STATUS.UNPAID)),
-      tail: "",
-    })),
+    // Занятие с непустым авансом ученика закрывать вручную нельзя: аванс
+    // списывается сам при статусе «проведено», и ручная отметка
+    // рассинхронизирует счёт.
+    unpaid: (f.unpaid_lessons || []).map((l) => {
+      const student = (admin.students || []).find((s) => Number(s.id) === Number(l.student_id));
+      const advanceHours = Number(student?.balance_lessons || 0);
+      return {
+        id: l.id,
+        name: `${l.student_name || "Занятие"} · ${fmt.dayMonth(l.starts_at)}`,
+        meta: advanceHours > 0
+          ? `${fmt.money(lessonPrice(l))} · аванс ${fmt.hours(advanceHours)} спишется сам`
+          : `${fmt.money(lessonPrice(l))} · ${dict.paymentStatus(l.payment_status).label}`,
+        notch: notchOf(dict.paymentStatus(dict.PAYMENT_STATUS.UNPAID)),
+        tail: "",
+        hasAdvance: advanceHours > 0,
+      };
+    }),
   };
 }
 

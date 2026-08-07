@@ -106,15 +106,22 @@ export function FinancesScreen({
 
   root.append(SectionCaption({ title: "Ожидают оплаты", count: unpaid.length }));
   if (unpaid.length) {
-    root.append(el("p", { class: "screen__note", text: "Проведите по строке справа налево, чтобы закрыть долг." }));
+    root.append(el("p", { class: "screen__note", text: unpaid.some((u) => !u.hasAdvance)
+      ? "Проведите по строке справа налево, чтобы закрыть долг. Занятия, покрытые авансом, списываются сами."
+      : "Эти занятия покрыты авансом — он спишется сам, вручную отмечать не нужно." }));
   }
   root.append(unpaid.length
     // Свайп закрывает долг сразу, поэтому вызывающий обязан дать отмену.
-    ? el("div", { class: "list" }, unpaid.map((u) => SwipeRow({
-        content: OperationRow({ name: u.name, meta: u.meta, notch: u.notch, tail: u.tail }),
-        actionLabel: "Закрыть долг",
-        onCommit: actions.closeDebt ? () => actions.closeDebt(u.id) : null,
-      })))
+    // Строки с авансом не свайпаются: там статус ставит не репетитор.
+    ? el("div", { class: "list" }, unpaid.map((u) => {
+        const row = OperationRow({ name: u.name, meta: u.meta, notch: u.notch, tail: u.tail });
+        if (u.hasAdvance) return row;
+        return SwipeRow({
+          content: row,
+          actionLabel: "Закрыть долг",
+          onCommit: actions.closeDebt ? () => actions.closeDebt(u.id) : null,
+        });
+      }))
     : EmptyState({
         title: "Все проведённые занятия оплачены",
         description: "Неоплаченные появятся здесь сразу после того, как вы отметите занятие проведённым.",

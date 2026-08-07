@@ -2653,19 +2653,21 @@ function FreeSlots({ days = [], duration = 60, onPick, note = "" } = {}) {
       el("p", { class: "screen__note", text: "Свободных окон нет. На выбранный горизонт подходящих окон не нашлось." }),
     ]);
   }
+  // Длительность одна на весь список — она сказана один раз сверху, а не в
+  // каждом чипе. Окон бывает под сотню, и вторая строка в каждом уводила
+  // кнопку отправки далеко вниз за экран.
   return el("div", { class: "free-slots" }, [
     note ? el("p", { class: "screen__note", text: note }) : null,
+    el("p", { class: "free-slots__dur", text: `Окна по ${duration} мин` }),
     ...days.map((day) => el("div", { class: "free-slots__day" }, [
       el("span", { class: "free-slots__title", text: day.title }),
       el("div", { class: "free-slots__grid" }, day.slots.map((slot) =>
         el("button", {
           type: "button",
           class: "slot-chip",
+          "aria-label": `${day.title}, ${slot.time}, ${duration} минут`,
           onClick: onPick ? () => onPick(slot.value) : null,
-        }, [
-          num(slot.time, "slot-chip__time"),
-          el("span", { class: "slot-chip__dur", text: `${duration} мин` }),
-        ]))),
+        }, [num(slot.time, "slot-chip__time")]))),
     ])),
   ]);
 }

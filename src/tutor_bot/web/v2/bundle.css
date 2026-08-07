@@ -912,7 +912,7 @@ body.is-modal-open {
   background: var(--bg);
   border-top: var(--hair) solid var(--border);
   border-radius: var(--radius-1) var(--radius-1) 0 0;
-  padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+  padding-bottom: 0;
   transform: translateY(var(--drag-y, 0));
   animation: sheet-in 180ms ease-out;
 }
@@ -934,8 +934,25 @@ body.is-modal-open {
   border-bottom: var(--hair) solid var(--border-hair);
 }
 .modal__title { flex: 1; font-size: var(--fs-modal); line-height: var(--lh-modal); font-weight: var(--fw-medium); }
-.modal__body { padding: var(--space-4) var(--gutter); display: flex; flex-direction: column; gap: var(--space-4); }
-.modal__footer { padding: 0 var(--gutter); display: flex; flex-direction: column; gap: var(--space-2); }
+.modal__body {
+  padding: var(--space-4) var(--gutter) calc(var(--space-4) + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+/* Кнопка отправки прижата ко дну листа и видна с любой позиции. Форма
+   записи показывает под сотню свободных окон, и раньше кнопка уезжала
+   под них: пролистать весь список ради одного нажатия. */
+.modal__footer {
+  position: sticky;
+  bottom: 0;
+  padding: var(--space-3) var(--gutter) calc(var(--space-3) + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background: var(--bg);
+  border-top: var(--hair) solid var(--border-hair);
+}
 /* Действия, которые не «сохранить»: подтвердить заявку, отклонить.
    Пустой блок не должен оставлять после себя отступ. */
 .form-extra { padding: var(--space-3) var(--gutter) 0; display: flex; flex-direction: column; gap: var(--space-2); }
@@ -1595,19 +1612,24 @@ body.is-modal-open {
   text-transform: uppercase;
   color: var(--text-2);
 }
-.free-slots__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: var(--space-2); }
+.free-slots__dur {
+  font-size: var(--fs-caps);
+  letter-spacing: var(--tr-caps);
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.free-slots__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: var(--space-1); }
+/* Высота ровно по минимуму касания: ниже нельзя, выше незачем. */
 .slot-chip {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
+  justify-content: center;
   min-height: var(--touch-min);
-  padding: var(--space-2);
+  padding: 0 var(--space-2);
   border: var(--hair) solid var(--border-strong);
   border-radius: var(--radius-1);
 }
 .slot-chip__time { font-size: var(--fs-body); }
-.slot-chip__dur { font-size: var(--fs-caps); color: var(--text-3); }
 
 /* Группы полей в модалке */
 .form-group { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-3); }

@@ -1923,6 +1923,34 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def app_version() -> dict[str, str]:
         return {"version": APP_VERSION}
 
+    @app.get("/api/diag")
+    async def diagnostics() -> dict[str, Any]:
+        """Состояние доставки апдейтов боту.
+
+        Веб-процесс знает тот же токен, что и бот, поэтому может спросить
+        Telegram напрямую. Нужно ровно для одного вопроса: доходят ли до
+        бота сообщения. Пока висит вебхук, getUpdates молча не отдаёт
+        ничего — процесс жив, ошибок нет, а бот «не отвечает».
+
+        Секретов не раскрывает: ни токена, ни данных учеников.
+        """
+        out: dict[str, Any] = {"bot_token_set": bool(state.settings.bot_token)}
+        try:
+            async with httpx.AsyncClient(timeout=10) as client:
+                me = await client.get(f"https://api.telegram.org/bot{state.settings.bot_token}/getMe")
+                out["getMe_ok"] = me.json().get("ok", False)
+                out["bot_username"] = me.json().get("result", {}).get("username")
+                hook = await client.get(
+                    f"https://api.telegram.org/bot{state.settings.bot_token}/getWebhookInfo"
+                )
+                info = hook.json().get("result", {})
+                out["webhook_url"] = info.get("url") or None
+                out["pending_updates"] = info.get("pending_update_count")
+                out["last_error"] = info.get("last_error_message")
+        except Exception as error:
+            out["error"] = f"{type(error).__name__}: {error}"
+        return out
+
     @app.get("/api/build")
     def app_build() -> dict[str, str]:
         # Отдельно от APP_VERSION: та константа продублирована в app.js и

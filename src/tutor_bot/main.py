@@ -334,6 +334,32 @@ def assert_polling_allowed() -> None:
     )
 
 
+async def ensure_polling_mode(bot: Bot) -> None:
+    """Снять вебхук перед опросом и записать в лог, что было.
+
+    Пока у бота установлен вебхук, getUpdates молча не отдаёт ничего:
+    процесс жив, ошибок нет, но сообщения до обработчиков не доходят.
+    Снаружи это выглядит как «бот не отвечает на /start» без единого
+    признака поломки — ровно то, что мы и наблюдали: аптайм веба растёт,
+    контейнер не перезапускается, а ответов нет.
+
+    Вызов идемпотентен: если вебхука нет, ничего не меняется. Ожидающие
+    апдейты не сбрасываем, накопившиеся сообщения дойдут.
+    """
+    try:
+        info = await bot.get_webhook_info()
+        if info.url:
+            logging.warning(
+                "Webhook %s was set — polling would receive nothing. Removing it.", info.url
+            )
+            await bot.delete_webhook(drop_pending_updates=False)
+            logging.info("Webhook removed, switching to polling")
+        else:
+            logging.info("No webhook is set, pending updates: %s", info.pending_update_count)
+    except Exception:
+        logging.exception("Failed to check or remove webhook before polling")
+
+
 async def main() -> None:
     logging.basicConfig(level=logging.INFO)
     load_dotenv()
@@ -352,6 +378,8 @@ async def main() -> None:
         google_sheets_reporter=GoogleSheetsReporter(settings),
     )
     dp.include_router(router)
+
+    await ensure_polling_mode(bot)
 
     supervisor = None
     if not _truthy_env("DISABLE_BACKGROUND_REMINDERS"):

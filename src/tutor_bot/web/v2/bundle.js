@@ -3346,6 +3346,33 @@ const FORMS = {
     return {
       title: isEdit ? "Редактировать занятие" : "Новое занятие",
       submitLabel: "Готово",
+      // Заявка от ученика решается здесь же, а не отдельным экраном:
+      // репетитор всё равно открывает карточку, чтобы посмотреть время.
+      // Без этих кнопок запись ученика упиралась в тупик — заявка
+      // приходила, а принять её в интерфейсе было нечем.
+      extra: isEdit && lesson.status === dict.LESSON_STATUS.PENDING
+        ? ({ close, done }) => {
+            const act = (label, kind, call) => {
+              const button = Button({ kind, label, full: true });
+              button.addEventListener("click", async () => {
+                button.disabled = true;
+                try {
+                  await call();
+                  close();
+                  await done();
+                } catch {
+                  button.disabled = false;
+                  button.textContent = "Не вышло, повторить";
+                }
+              });
+              return button;
+            };
+            return [
+              act("Подтвердить заявку", "main", () => api.confirmLesson(lesson.id, {})),
+              act("Отклонить заявку", "second", () => api.rejectLesson(lesson.id, {})),
+            ];
+          }
+        : null,
       body: [
         group("Информация об уроке", [
           isEdit ? null : Select({ label: "Ученик", options: studentOptions(ctx.students), ...form.bind("student_id") }),
@@ -3995,10 +4022,20 @@ function openForm(name, params = {}, { onDone } = {}) {
   if (!def) return;
 
   const bodyHost = el("div", { class: "form-body" }, def.body);
-  const nodes = [bodyHost];
+  // Действия, которые не «сохранить»: подтвердить заявку, отклонить,
+  // удалить. Им нужна сама модалка, чтобы закрыться после успеха, а она
+  // создаётся ниже — поэтому им отведено место, а наполняется оно после.
+  const extraHost = el("div", { class: "form-extra" });
+  const nodes = [bodyHost, extraHost];
   if (def.note) nodes.push(el("p", { class: "modal-note", text: def.note }));
 
   const modal = Modal({ title: def.title, body: nodes });
+  if (def.extra) {
+    extraHost.append(...def.extra({
+      close: () => modal.close(),
+      done: () => onDone?.(),
+    }).filter(Boolean));
+  }
 
   if (def.submitLabel) {
     modal.node.querySelector(".modal").append(

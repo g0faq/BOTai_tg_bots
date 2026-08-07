@@ -43,6 +43,7 @@ from tutor_bot.domain.models import (
     UserAccount,
 )
 from tutor_bot.main import build_work_hours
+from tutor_bot.services.heartbeat import seconds_since_last_update
 from tutor_bot.services.homework import submit_homework
 from tutor_bot.services.homework_lifecycle import split_homeworks
 from tutor_bot.services.payments import confirm_payment, reject_payment
@@ -1949,6 +1950,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 out["last_error"] = info.get("last_error_message")
         except Exception as error:
             out["telegram_error"] = f"{type(error).__name__}: {error}"
+
+        # Принимает ли бот сообщения. Отдельный вопрос от «доступен ли
+        # Telegram отсюда»: веб-процесс может достучаться до Telegram в тот
+        # момент, когда у процесса бота соединение оборвано.
+        age = seconds_since_last_update(state.settings.database_path)
+        out["seconds_since_last_update"] = None if age is None else round(age, 1)
 
         # Отличаем «закрыт Telegram» от «нет исходящей сети вообще»: без
         # этого невозможно понять, к кому идти с проблемой.

@@ -16,6 +16,7 @@ from tutor_bot.bot.handlers import router
 from tutor_bot.config import Settings, load_dotenv, load_settings
 from tutor_bot.domain.enums import BalanceMode, LessonPaymentStatus, LessonStatus, PlanItemStatus
 from tutor_bot.services.google_sheets import GoogleSheetsReporter
+from tutor_bot.services.heartbeat import touch_update_heartbeat
 from tutor_bot.services.homework_lifecycle import purge_expired
 from tutor_bot.services.payments import mark_lesson_conducted
 from tutor_bot.services.scheduling import WorkHours
@@ -280,6 +281,9 @@ async def safe_send_message(bot: Bot, chat_id: int, text: str) -> bool:
     return True
 
 
+MENU_BUTTON_BUDGET_SECONDS = 180
+
+
 async def setup_miniapp_menu_button(bot: Bot, settings: Settings, db: SQLiteStorage) -> None:
     if not settings.telegram_webapp_url:
         return
@@ -306,11 +310,26 @@ async def setup_miniapp_menu_button(bot: Bot, settings: Settings, db: SQLiteStor
                 )
                 await asyncio.sleep(attempt * 2)
 
-    await set_menu_button_with_retry()
-    known_chat_ids = {user.telegram_id for user in db.list_user_accounts()}
-    known_chat_ids.update(settings.admin_telegram_ids)
-    for chat_id in sorted(known_chat_ids):
-        await set_menu_button_with_retry(chat_id)
+    async def set_all() -> None:
+        await set_menu_button_with_retry()
+        known_chat_ids = {user.telegram_id for user in db.list_user_accounts()}
+        known_chat_ids.update(settings.admin_telegram_ids)
+        for chat_id in sorted(known_chat_ids):
+            await set_menu_button_with_retry(chat_id)
+
+    # Предел на весь обход: на плохом канале он иначе растягивается на часы
+    # и держит соединения, которые нужнее polling.
+    try:
+        await asyncio.wait_for(set_all(), timeout=MENU_BUTTON_BUDGET_SECONDS)
+    except TimeoutError:
+        logging.warning(
+            "Menu button setup did not finish in %s seconds, leaving it as is",
+            MENU_BUTTON_BUDGET_SECONDS,
+        )
+    except asyncio.CancelledError:
+        raise
+    except Exception:
+        logging.exception("Menu button setup failed")
 
 
 def _truthy_env(name: str) -> bool:
@@ -390,7 +409,6 @@ async def main() -> None:
 
     db = SQLiteStorage(settings.database_path)
     bot = Bot(settings.bot_token, session=build_session())
-    await setup_miniapp_menu_button(bot, settings, db)
     dp = Dispatcher(
         db=db,
         settings=settings,
@@ -399,7 +417,27 @@ async def main() -> None:
     )
     dp.include_router(router)
 
+    @dp.update.outer_middleware()
+    async def mark_update_received(handler, event, data):  # type: ignore[no-untyped-def]
+        """Отметка ставится до обработчика и не зависит от его исхода:
+        вопрос, на который она отвечает, — дошло ли сообщение, а не
+        удалось ли на него ответить."""
+        touch_update_heartbeat(settings.database_path)
+        return await handler(event, data)
+
     await ensure_polling_mode(bot)
+
+    # Кнопку меню ставим в фоне, уже после запуска polling.
+    #
+    # Раньше это делалось до него и по одному запросу на каждый известный
+    # чат, с пятью попытками и паузами 2+4+6+8 секунд. Пока канал до
+    # Telegram был исправен, разница не чувствовалась. Когда он стал
+    # отваливаться примерно в трети соединений, тот же цикл начал держать
+    # старт минутами: бот уже запущен, а сообщений ещё не читает — со
+    # стороны это выглядит как «бот не отвечает на /start».
+    #
+    # Кнопка меню — украшение, приём сообщений — работа. Работа вперёд.
+    menu_task = asyncio.create_task(setup_miniapp_menu_button(bot, settings, db))
 
     supervisor = None
     if not _truthy_env("DISABLE_BACKGROUND_REMINDERS"):
@@ -415,6 +453,7 @@ async def main() -> None:
             else:
                 break
     finally:
+        menu_task.cancel()
         if supervisor is not None:
             supervisor.stop()
         db.close()

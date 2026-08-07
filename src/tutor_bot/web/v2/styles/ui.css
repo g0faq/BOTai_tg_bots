@@ -1505,3 +1505,57 @@
   .ribbon-row__tail .pill__label { display: none; }
   .ribbon-row__tail .pill { padding: 0 var(--space-1); }
 }
+
+/* ======================================================================== */
+/* Сворачиваемый раздел и свайп по строке                                   */
+/* ======================================================================== */
+
+.collapsible__head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--row-1);
+  padding: var(--space-3) var(--gutter) var(--space-2);
+  text-align: left;
+  color: var(--text);
+}
+.collapsible__title {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: var(--fs-caps);
+  letter-spacing: var(--tr-caps);
+  text-transform: uppercase;
+  font-weight: var(--fw-semibold);
+  color: var(--text-2);
+}
+.collapsible__count { font-size: var(--fs-caps); color: var(--text-3); }
+.collapsible__chev { color: var(--text-3); font-size: var(--fs-caps); }
+.collapsible.is-open .collapsible__chev { color: var(--accent); }
+
+.swipe { position: relative; overflow: hidden; }
+.swipe__action {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 var(--space-4);
+  border: 0;
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-medium);
+}
+.swipe__action--debt { background: var(--sem-debt); color: var(--accent-ink); }
+.swipe__surface {
+  position: relative;
+  background: var(--bg);
+  transform: translateX(var(--swipe-x, 0));
+  transition: transform 180ms ease-out;
+}
+.swipe__surface.is-dragging { transition: none; }
+.swipe.is-committed { max-height: 0; opacity: 0; transition: max-height 200ms ease-in, opacity 160ms ease-in; }
+
+.toast__text + .btn--inline { flex: none; }

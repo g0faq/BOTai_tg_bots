@@ -6,13 +6,14 @@
  */
 
 import { el, num } from "../ui/dom.js";
-import { ScreenHead, SectionCaption, DayHeader } from "../ui/section.js";
+import { ScreenHead, SectionCaption, DayHeader, Collapsible } from "../ui/section.js";
 import { StatCell, StatGrid } from "../ui/stat.js";
 import { Button } from "../ui/button.js";
 import { Select } from "../ui/field.js";
 import { IncomeChart } from "../ui/charts.js";
 import { AdvanceRow } from "../ui/list-items.js";
 import { OperationRow } from "../ui/rows.js";
+import { SwipeRow } from "../ui/swipe-row.js";
 import { EmptyState } from "../ui/feedback.js";
 import { paymentStatusOptions } from "../core/dict.js";
 
@@ -30,6 +31,7 @@ export function FinancesScreen({
   advances = [],
   operationDays = [],
   operationsCount = 0,
+  operationsOpen = false,
   toCheck = [],
   unpaid = [],
   filter = "",
@@ -64,19 +66,32 @@ export function FinancesScreen({
         description: "Ученики с оплаченными занятиями вперёд появятся здесь.",
       }));
 
-  root.append(
-    el("div", { class: "screen__pad" }, [
+  // История по всей базе длинная, поэтому по умолчанию свёрнута.
+  const history = el("div", { class: "history" });
+  if (operationsOpen) {
+    history.append(el("div", { class: "screen__pad" }, [
       Select({ value: filter, options: OPERATION_FILTERS(), onChange: actions.setFilter }),
-    ]),
-    SectionCaption({ title: "История операций", count: operationsCount }),
-  );
-
-  for (const day of operationDays) {
-    root.append(DayHeader({ title: day.title, total: day.total }));
-    root.append(el("div", { class: "list" }, day.items.map((o) => OperationRow({
-      name: o.name, meta: o.meta, notch: o.notch, tail: o.tail,
-    }))));
+    ]));
+    if (!operationDays.length) {
+      history.append(EmptyState({
+        title: "Операций нет",
+        description: "Подтверждённые и ожидающие оплаты появятся здесь.",
+      }));
+    }
+    for (const day of operationDays) {
+      history.append(DayHeader({ title: day.title, total: day.total }));
+      history.append(el("div", { class: "list" }, day.items.map((o) => OperationRow({
+        name: o.name, meta: o.meta, notch: o.notch, tail: o.tail,
+      }))));
+    }
   }
+  root.append(Collapsible({
+    title: "История операций",
+    count: operationsCount,
+    open: operationsOpen,
+    onToggle: actions.toggleOperations,
+    content: history,
+  }));
 
   root.append(SectionCaption({ title: "Ожидают проверки", count: toCheck.length }));
   root.append(toCheck.length
@@ -90,9 +105,15 @@ export function FinancesScreen({
       }));
 
   root.append(SectionCaption({ title: "Ожидают оплаты", count: unpaid.length }));
+  if (unpaid.length) {
+    root.append(el("p", { class: "screen__note", text: "Проведите по строке справа налево, чтобы закрыть долг." }));
+  }
   root.append(unpaid.length
-    ? el("div", { class: "list" }, unpaid.map((u) => OperationRow({
-        name: u.name, meta: u.meta, notch: u.notch, tail: u.tail,
+    // Свайп закрывает долг сразу, поэтому вызывающий обязан дать отмену.
+    ? el("div", { class: "list" }, unpaid.map((u) => SwipeRow({
+        content: OperationRow({ name: u.name, meta: u.meta, notch: u.notch, tail: u.tail }),
+        actionLabel: "Закрыть долг",
+        onCommit: actions.closeDebt ? () => actions.closeDebt(u.id) : null,
       })))
     : EmptyState({
         title: "Все проведённые занятия оплачены",

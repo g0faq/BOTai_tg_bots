@@ -9,7 +9,7 @@ import { el } from "./ui/dom.js";
 import { createRouter } from "./core/router.js";
 import { getState, setState, setPayload } from "./core/state.js";
 import { Header, TabBar, Fab } from "./ui/shell.js";
-import { IconButton } from "./ui/button.js";
+import { Button, IconButton } from "./ui/button.js";
 import { Toast } from "./ui/feedback.js";
 import * as api from "./core/api.js";
 import * as adapt from "./core/adapt.js";
@@ -50,6 +50,7 @@ const view = {
   calendarMode: "week",
   calendarArchive: false,
   operationFilter: "",
+  operationsOpen: false,
   cardTab: "profile",
   screen: "overview",
 };
@@ -61,11 +62,39 @@ const tabForScreen = (id) => (id in TAB_FOR_SCREEN ? TAB_FOR_SCREEN[id] : id);
 
 const tg = () => globalThis.Telegram?.WebApp;
 
-function toast(text, tone = "none") {
+function toast(text, tone = "none", action = null) {
   const host = document.getElementById("toast-host");
   if (!host) return;
-  host.replaceChildren(Toast({ text, tone }));
-  setTimeout(() => host.replaceChildren(), 4000);
+  const button = action
+    ? Button({ kind: "inline", label: action.label, onClick: () => { host.replaceChildren(); action.onClick(); } })
+    : null;
+  host.replaceChildren(Toast({ text, tone, action: button }));
+  // С отменой держим дольше: пользователю нужно успеть передумать.
+  setTimeout(() => host.replaceChildren(), action ? 8000 : 4000);
+}
+
+/**
+ * Закрытие долга свайпом: занятие помечается оплаченным.
+ *
+ * Свайп легко сделать случайно, а действие финансовое, поэтому рядом с
+ * подтверждением всегда живёт отмена — она возвращает прежний статус.
+ */
+async function closeDebt(lessonId) {
+  try {
+    // Именно payment_status: роут /confirm подтверждает заявку на занятие,
+    // а не оплату, и для прочих статусов молча ничего не делает.
+    await api.updateLesson(lessonId, { payment_status: dict.PAYMENT_STATUS.CONFIRMED });
+    await reload();
+    toast("Долг закрыт", "done", {
+      label: "Отменить",
+      onClick: () => run("Долг возвращён", () => api.updateLesson(lessonId, {
+        payment_status: dict.PAYMENT_STATUS.UNPAID,
+      })),
+    });
+  } catch (error) {
+    toast(error?.detail || "Не удалось закрыть долг", "debt");
+    await reload();
+  }
 }
 
 /** Действие с обновлением payload и понятной ошибкой вместо тишины. */
@@ -198,7 +227,7 @@ function tutorScreens(admin) {
           toggleArchive: () => { view.calendarArchive = !view.calendarArchive; render(); },
           openLesson: (id) => form("lesson", { lesson: findLesson(admin, id) }),
           markConducted: (id) => run("Занятие проведено", () => api.updateLesson(id, { status: "проведено" })),
-          confirmPayment: (id) => run("Оплата подтверждена", () => api.confirmLesson(id)),
+          confirmPayment: (id) => run("Оплата подтверждена", () => api.updateLesson(id, { payment_status: dict.PAYMENT_STATUS.CONFIRMED })),
           deleteClosedSlot: (id) => run("Окно открыто", () => api.deleteClosedSlot(id)),
           addLesson: () => form("lesson"),
           freeSlots: () => form("freeSlots", { onPick: (startsAt) => form("lesson", { lesson: { starts_at: startsAt, duration_minutes: 60 } }) }),
@@ -233,11 +262,14 @@ function tutorScreens(admin) {
       mount: (c) => c.append(FinancesScreen({
         ...adapt.adaptFinances(admin, { operationFilter: view.operationFilter }),
         filter: view.operationFilter,
+        operationsOpen: view.operationsOpen,
         actions: {
           createPayment: () => form("payment"),
           confirmPayment: (id) => run("Оплата подтверждена", () => api.confirmPayment(id)),
           editAdvance: (id) => form("advance", { advance: (admin.finances?.advances || []).find((a) => Number(a.payment_id) === Number(id)) }),
           setFilter: (v) => { view.operationFilter = v; render(); },
+          toggleOperations: () => { view.operationsOpen = !view.operationsOpen; render(); },
+          closeDebt,
         },
       })),
     }),

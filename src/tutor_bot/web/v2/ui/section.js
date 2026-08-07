@@ -58,3 +58,29 @@ export function CardTabs({ items = [], value, onSelect } = {}) {
       });
     }));
 }
+
+/**
+ * Сворачиваемый раздел: заголовок работает переключателем.
+ *
+ * Нужен там, где содержимое длинное и по умолчанию мешает — например
+ * история операций за всё время.
+ */
+export function Collapsible({ title, count = null, open = false, onToggle, content = null } = {}) {
+  const box = el("section", { class: `collapsible${open ? " is-open" : ""}` });
+  box.append(
+    el("button", {
+      type: "button",
+      class: "collapsible__head",
+      "aria-expanded": open ? "true" : "false",
+      onClick: onToggle,
+    }, [
+      el("span", { class: "collapsible__title" }, [
+        title,
+        count == null ? null : num(count, "collapsible__count"),
+      ]),
+      el("span", { class: "collapsible__chev", "aria-hidden": "true", text: open ? "▴" : "▾" }),
+    ]),
+  );
+  if (open && content) box.append(content);
+  return box;
+}
